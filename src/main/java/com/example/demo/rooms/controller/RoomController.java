@@ -1,5 +1,7 @@
 package com.example.demo.rooms.controller;
 
+import com.example.demo.buildings.entity.Building;
+import com.example.demo.buildings.repository.BuildingRepository;
 import com.example.demo.rooms.dto.RoomDto;
 import com.example.demo.rooms.dto.RoomListDto;
 import com.example.demo.rooms.entity.Room;
@@ -41,6 +43,7 @@ public class RoomController {
     private final RoomService roomService;
     private final RoomMapper roomMapper;
     private final RoomTypeService roomTypeService;
+    private final BuildingRepository buildingRepository;
 
     @ModelAttribute("currentMenu")
     public String currentMenu() {
@@ -50,6 +53,11 @@ public class RoomController {
     @ModelAttribute("roomTypes")
     public List<RoomTypeListDto> roomTypes() {
         return roomTypeService.findAllAsListDto();
+    }
+
+    @ModelAttribute("buildings")
+    public List<Building> buildings() {
+        return buildingRepository.findAll();
     }
 
     @GetMapping

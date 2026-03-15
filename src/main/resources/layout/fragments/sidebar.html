@@ -22,6 +22,14 @@
   </a>
 
   <a class="sidebar-link"
+     th:href="@{/admin/buildings}"
+     th:classappend="${currentMenu == 'buildings'} ? ' active' : ''"
+     data-label="Toà nhà">
+    <i class="bi bi-building nav-icon"></i>
+    <span class="nav-text">Toà nhà</span>
+  </a>
+
+  <a class="sidebar-link"
      th:href="@{/admin/rooms}"
      th:classappend="${currentMenu == 'rooms'} ? ' active' : ''"
      data-label="Phòng học">

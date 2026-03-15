@@ -20,7 +20,9 @@ public class RoomListDto {
     private String roomCode;
     private String roomName;
     private UUID buildingId;
+    private String buildingName;
     private UUID roomTypeId;
+    private String roomTypeName;
     private Integer floor;
     private Integer capacity;
     private Double area;

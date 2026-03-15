@@ -1,14 +1,10 @@
-package com.example.demo.rooms.entity;
+package com.example.demo.buildings.entity;
 
-import com.example.demo.buildings.entity.Building;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -22,46 +18,30 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "rooms")
+@Table(name = "buildings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Room {
+public class Building {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "UNIQUEIDENTIFIER")
+    @Column(name = "building_id", columnDefinition = "UNIQUEIDENTIFIER")
     private UUID id;
 
-    @Column(name = "room_code", nullable = false, unique = true, columnDefinition = "NVARCHAR(20)")
-    private String roomCode;
+    @Column(name = "building_code", nullable = false, unique = true, columnDefinition = "NVARCHAR(20)")
+    private String buildingCode;
 
-    @Column(name = "room_name", nullable = false, columnDefinition = "NVARCHAR(100)")
-    private String roomName;
+    @Column(name = "building_name", nullable = false, columnDefinition = "NVARCHAR(100)")
+    private String buildingName;
 
-    @Column(name = "building_id", nullable = false, columnDefinition = "UNIQUEIDENTIFIER")
-    private UUID buildingId;
+    @Column(name = "address", columnDefinition = "NVARCHAR(255)")
+    private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "building_id", insertable = false, updatable = false, nullable = false)
-    private Building building;
-
-    @Column(name = "room_type_id", nullable = false, columnDefinition = "UNIQUEIDENTIFIER")
-    private UUID roomTypeId;
-
-    @Column(name = "floor")
-    private Integer floor;
-
-    @Column(name = "capacity")
-    private Integer capacity;
-
-    @Column(name = "area")
-    private Double area;
-
-    @Column(name = "status", columnDefinition = "NVARCHAR(20)")
-    private String status;
+    @Column(name = "description", columnDefinition = "NVARCHAR(500)")
+    private String description;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
@@ -87,4 +67,3 @@ public class Room {
         this.updatedAt = LocalDateTime.now();
     }
 }
-

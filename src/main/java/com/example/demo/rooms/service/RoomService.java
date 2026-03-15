@@ -1,10 +1,14 @@
 package com.example.demo.rooms.service;
 
+import com.example.demo.buildings.entity.Building;
+import com.example.demo.buildings.repository.BuildingRepository;
 import com.example.demo.rooms.dto.RoomDto;
 import com.example.demo.rooms.dto.RoomListDto;
 import com.example.demo.rooms.entity.Room;
 import com.example.demo.rooms.mapper.RoomMapper;
 import com.example.demo.rooms.repository.RoomRepository;
+import com.example.demo.rome_types.entity.RoomType;
+import com.example.demo.rome_types.repository.RoomTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -34,6 +38,8 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
+    private final BuildingRepository buildingRepository;
+    private final RoomTypeRepository roomTypeRepository;
 
     public Page<RoomListDto> search(String keyword,
                                     UUID buildingId,
@@ -51,8 +57,22 @@ public class RoomService {
         );
         List<RoomListDto> dtos = page.getContent().stream()
                 .map(roomMapper::toListDto)
+                .peek(this::fillBuildingAndRoomTypeNames)
                 .toList();
         return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
+    }
+
+    private void fillBuildingAndRoomTypeNames(RoomListDto dto) {
+        if (dto.getBuildingId() != null) {
+            buildingRepository.findById(dto.getBuildingId())
+                    .map(Building::getBuildingName)
+                    .ifPresent(dto::setBuildingName);
+        }
+        if (dto.getRoomTypeId() != null) {
+            roomTypeRepository.findById(dto.getRoomTypeId())
+                    .map(RoomType::getRoomTypeName)
+                    .ifPresent(dto::setRoomTypeName);
+        }
     }
 
     public Optional<RoomDto> findByIdAsDto(UUID id) {
@@ -76,6 +96,7 @@ public class RoomService {
     public List<RoomListDto> findAllAsListDto() {
         return roomRepository.findAll().stream()
                 .map(roomMapper::toListDto)
+                .peek(this::fillBuildingAndRoomTypeNames)
                 .collect(Collectors.toList());
     }
 

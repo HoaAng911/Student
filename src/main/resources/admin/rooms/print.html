@@ -25,8 +25,8 @@
         <th>#</th>
         <th>Mã phòng</th>
         <th>Tên phòng</th>
-        <th>BuildingId</th>
-        <th>RoomTypeId</th>
+        <th>Tòa nhà</th>
+        <th>Loại phòng</th>
         <th class="text-center">Tầng</th>
         <th class="text-center">Sức chứa</th>
         <th class="text-center">Diện tích</th>
@@ -39,8 +39,8 @@
         <td th:text="${stat.count}"></td>
         <td th:text="${r.roomCode}"></td>
         <td th:text="${r.roomName}"></td>
-        <td th:text="${r.buildingId}"></td>
-        <td th:text="${r.roomTypeId}"></td>
+        <td th:text="${r.buildingName} ?: '-'"></td>
+        <td th:text="${r.roomTypeName} ?: '-'"></td>
         <td class="text-center" th:text="${r.floor}"></td>
         <td class="text-center" th:text="${r.capacity}"></td>
         <td class="text-center" th:text="${r.area}"></td>
