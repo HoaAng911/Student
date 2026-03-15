@@ -1,9 +1,10 @@
-package com.example.nhom7.rome_types.mapper;
+package com.example.demo.rome_types.mapper;
 
-import com.example.nhom7.rome_types.dto.RoomTypeDto;
-import com.example.nhom7.rome_types.dto.RoomTypeListDto;
-import com.example.nhom7.rome_types.entity.RoomType;
 import org.springframework.stereotype.Component;
+
+import com.example.demo.rome_types.dto.RoomTypeDto;
+import com.example.demo.rome_types.dto.RoomTypeListDto;
+import com.example.demo.rome_types.entity.RoomType;
 
 @Component
 public class RoomTypeMapper {

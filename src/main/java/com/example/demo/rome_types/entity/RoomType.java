@@ -1,4 +1,4 @@
-package com.example.nhom7.rome_types.entity;
+package com.example.demo.rome_types.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

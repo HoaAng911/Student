@@ -1,4 +1,4 @@
-package com.example.nhom7.rome_types.dto;
+package com.example.demo.rome_types.dto;
 
 import lombok.*;
 

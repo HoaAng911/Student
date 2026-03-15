@@ -1,11 +1,12 @@
-package com.example.nhom7.rome_types.repository;
+package com.example.demo.rome_types.repository;
 
-import com.example.nhom7.rome_types.entity.RoomType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.example.demo.rome_types.entity.RoomType;
 
 import java.util.Optional;
 import java.util.UUID;

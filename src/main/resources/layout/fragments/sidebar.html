@@ -21,6 +21,14 @@
     <span class="nav-text">Loại phòng học</span>
   </a>
 
+  <a class="sidebar-link"
+     th:href="@{/admin/rooms}"
+     th:classappend="${currentMenu == 'rooms'} ? ' active' : ''"
+     data-label="Phòng học">
+    <i class="bi bi-door-open-fill nav-icon"></i>
+    <span class="nav-text">Phòng học</span>
+  </a>
+
   <!-- Phần mở rộng tương lai -->
   <div class="sidebar-label mt-2">Sắp ra mắt</div>
 

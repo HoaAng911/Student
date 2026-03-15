@@ -1,10 +1,5 @@
-package com.example.nhom7.rome_types.controller;
+package com.example.demo.rome_types.controller;
 
-import com.example.nhom7.rome_types.dto.RoomTypeDto;
-import com.example.nhom7.rome_types.dto.RoomTypeListDto;
-import com.example.nhom7.rome_types.entity.RoomType;
-import com.example.nhom7.rome_types.mapper.RoomTypeMapper;
-import com.example.nhom7.rome_types.service.RoomTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +14,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.demo.rome_types.dto.RoomTypeDto;
+import com.example.demo.rome_types.dto.RoomTypeListDto;
+import com.example.demo.rome_types.entity.RoomType;
+import com.example.demo.rome_types.mapper.RoomTypeMapper;
+import com.example.demo.rome_types.service.RoomTypeService;
 
 import jakarta.validation.Valid;
 import java.util.List;
