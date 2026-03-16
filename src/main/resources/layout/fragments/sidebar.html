@@ -37,6 +37,14 @@
     <span class="nav-text">Phòng học</span>
   </a>
 
+  <a class="sidebar-link"
+     th:href="@{/admin/equipments}"
+     th:classappend="${currentMenu == 'equipments'} ? ' active' : ''"
+     data-label="Thiết bị">
+    <i class="bi bi-gear-fill nav-icon"></i>
+    <span class="nav-text">Thiết bị</span>
+  </a>
+
   <!-- Phần mở rộng tương lai -->
   <div class="sidebar-label mt-2">Sắp ra mắt</div>
 
