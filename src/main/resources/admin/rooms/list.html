@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Quản lý phòng học', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/admin}">Trang quản trị</a></li>
+        <li class="breadcrumb-item active">Phòng học</li>
+      </ol>
+    </nav>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${importErrors}" class="alert alert-warning alert-dismissible fade show">
+      <strong><i class="bi bi-exclamation-circle me-1"></i> Chi tiết lỗi import:</strong>
+      <ul class="mb-0 mt-1">
+        <li th:each="err : ${importErrors}" th:text="${err}"></li>
+      </ul>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-door-open-fill me-2 text-primary"></i>Danh sách phòng học
+        </h5>
+        <div class="d-flex flex-wrap gap-2">
+          <a th:href="@{/admin/rooms/add}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i> Thêm mới
+          </a>
+          <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-upload me-1"></i> Import Excel
+          </button>
+          <a th:href="@{/admin/rooms/export/excel}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+          </a>
+          <a th:href="@{/admin/rooms/print(keyword=${keyword}, buildingId=${buildingId}, roomTypeId=${roomTypeId}, status=${status})}" target="_blank" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-printer me-1"></i> In
+          </a>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form th:action="@{/admin/rooms}" method="get" class="row g-2 mb-3">
+          <div class="col-12 col-md-2">
+            <input type="text" name="keyword" th:value="${keyword}" class="form-control form-control-sm"
+                   placeholder="Tìm theo mã, tên..."/>
+          </div>
+          <div class="col-12 col-md-2">
+            <select name="buildingId" class="form-select form-select-sm">
+              <option value="">-- Tòa nhà --</option>
+              <option th:each="b : ${buildings}"
+                      th:value="${b.id}"
+                      th:selected="${buildingId != null and buildingId == b.id}"
+                      th:text="${b.buildingCode + ' - ' + b.buildingName}"></option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <select name="roomTypeId" class="form-select form-select-sm">
+              <option value="">-- Loại phòng --</option>
+              <option th:each="rt : ${roomTypes}"
+                      th:value="${rt.roomTypeId}"
+                      th:selected="${roomTypeId != null and roomTypeId == rt.roomTypeId}"
+                      th:text="${rt.roomTypeName}"></option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <select name="status" class="form-select form-select-sm">
+              <option value="">-- Trạng thái --</option>
+              <option value="AVAILABLE" th:selected="${status == 'AVAILABLE'}">AVAILABLE</option>
+              <option value="IN_USE" th:selected="${status == 'IN_USE'}">IN_USE</option>
+              <option value="MAINTENANCE" th:selected="${status == 'MAINTENANCE'}">MAINTENANCE</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-1">
+            <select name="isActive" class="form-select form-select-sm">
+              <option value="">-- HĐ --</option>
+              <option value="true" th:selected="${isActive != null and isActive == true}">Đang dùng</option>
+              <option value="false" th:selected="${isActive != null and isActive == false}">Ngưng</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i class="bi bi-search me-1"></i> Lọc
+            </button>
+          </div>
+          <div class="col-auto">
+            <a th:href="@{/admin/rooms}" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Làm mới
+            </a>
+          </div>
+        </form>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle mb-0">
+            <thead class="table-primary">
+              <tr>
+                <th class="text-center" style="width: 50px;">#</th>
+                <th>Mã phòng</th>
+                <th>Tên phòng</th>
+                <th>Tòa nhà</th>
+                <th>Loại phòng</th>
+                <th class="text-center">Tầng</th>
+                <th class="text-center">Sức chứa</th>
+                <th class="text-center">Diện tích</th>
+                <th>Trạng thái</th>
+                <th class="text-center">HĐ</th>
+                <th class="text-center" style="width: 150px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(roomPage.content)}">
+                <td colspan="11" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox fs-4 d-block mb-2"></i>Chưa có dữ liệu.
+                </td>
+              </tr>
+              <tr th:each="r, stat : ${roomPage.content}">
+                <td class="text-center text-muted" th:text="${currentPage * 10 + stat.count}"></td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary fw-semibold" th:text="${r.roomCode}"></span>
+                </td>
+                <td th:text="${r.roomName}"></td>
+                <td class="text-muted" th:text="${r.buildingName} ?: '-'"></td>
+                <td th:text="${r.roomTypeName} ?: '-'"></td>
+                <td class="text-center" th:text="${r.floor != null} ? ${r.floor} : '-'"></td>
+                <td class="text-center" th:text="${r.capacity != null} ? ${r.capacity} : '-'"></td>
+                <td class="text-center" th:text="${r.area != null} ? ${r.area} : '-'"></td>
+                <td th:text="${r.status} ?: '-'"></td>
+                <td class="text-center">
+                  <span class="badge" th:classappend="${r.isActive} ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'" th:text="${r.isActive} ? 'Đang dùng' : 'Ngưng'"></span>
+                </td>
+                <td class="text-center">
+                  <a th:href="@{/admin/rooms/edit/{id}(id=${r.id})}" class="btn btn-sm btn-outline-primary me-1">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <form th:action="@{/admin/rooms/delete/{id}(id=${r.id})}" method="post" class="d-inline"
+                        onsubmit="return confirm('Bạn có chắc muốn xóa phòng này?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3" th:if="${roomPage.totalElements > 0}">
+          <small class="text-muted">
+            Tổng <strong th:text="${roomPage.totalElements}"></strong> bản ghi
+            | Trang <strong th:text="${currentPage + 1}"></strong> / <strong th:text="${totalPages}"></strong>
+          </small>
+          <nav th:if="${totalPages > 1}">
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/rooms(keyword=${keyword}, buildingId=${buildingId}, roomTypeId=${roomTypeId}, status=${status}, isActive=${isActive}, page=${currentPage - 1}, size=10)}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+              <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/admin/rooms(keyword=${keyword}, buildingId=${buildingId}, roomTypeId=${roomTypeId}, status=${status}, isActive=${isActive}, page=${i}, size=10)}" th:text="${i + 1}"></a>
+              </li>
+              <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/rooms(keyword=${keyword}, buildingId=${buildingId}, roomTypeId=${roomTypeId}, status=${status}, isActive=${isActive}, page=${currentPage + 1}, size=10)}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form th:action="@{/admin/rooms/import/excel}" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+              <h5 class="modal-title" id="importModalLabel">
+                <i class="bi bi-upload me-2"></i>Import Excel
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info py-2 small">
+                <i class="bi bi-info-circle me-1"></i>
+                File <code>.xlsx</code> cần có 9 cột (dòng 1 là tiêu đề):
+                <strong>Mã phòng</strong>, <strong>Tên phòng</strong>, <strong>BuildingId (UUID)</strong>,
+                <strong>RoomTypeId (UUID)</strong>, <strong>Tầng</strong>, <strong>Sức chứa</strong>,
+                <strong>Diện tích</strong>, <strong>Trạng thái</strong>, <strong>Active (1/0)</strong>.
+              </div>
+              <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required/>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-upload me-1"></i> Import
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>
