@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật lịch đặt phòng' : 'Thêm lịch đặt phòng', content=~{:: content})}">
+
+<body>
+    <th:block th:fragment="content">
+        <div class="container-fluid">
+
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin}">Trang quản trị</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/admin/schedule-overrides}">Lịch đặt phòng</a></li>
+                    <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0" style="max-width: 780px;">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="bi bi-calendar-plus-fill me-2 text-primary"></i>
+                        <span th:text="${isEdit} ? 'Cập nhật lịch đặt phòng' : 'Thêm lịch đặt phòng'"></span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/schedule-overrides/save}" th:object="${override}" method="post"
+                        novalidate>
+                        <input type="hidden" th:field="*{id}" th:if="${isEdit}" />
+                        <input type="hidden" name="isEdit" th:value="${isEdit}" />
+
+                        <div class="row g-3">
+                            <!-- Override Code -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Mã đặt phòng <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" th:field="*{overrideCode}"
+                                    th:class="'form-control' + (${#fields.hasErrors('overrideCode')} ? ' is-invalid' : '')"
+                                    maxlength="30" placeholder="VD: OVR-001" th:readonly="${isEdit}" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('overrideCode')}"
+                                    th:errors="*{overrideCode}"></div>
+                                <div class="form-text" th:if="${isEdit}">Mã không thể thay đổi sau khi tạo.</div>
+                            </div>
+
+                            <!-- Room -->
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Phòng <span class="text-danger">*</span></label>
+                                <select th:field="*{roomId}"
+                                    th:class="'form-select' + (${#fields.hasErrors('roomId')} ? ' is-invalid' : '')">
+                                    <option value="" disabled>-- Chọn phòng --</option>
+                                    <option th:each="r : ${rooms}" th:value="${r.id}"
+                                        th:text="${r.roomCode + ' - ' + r.roomName}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('roomId')}"
+                                    th:errors="*{roomId}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <!-- Start Time -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Thời gian bắt đầu <span
+                                        class="text-danger">*</span></label>
+                                <input type="datetime-local" th:field="*{startTime}"
+                                    th:class="'form-control' + (${#fields.hasErrors('startTime')} ? ' is-invalid' : '')" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}"
+                                    th:errors="*{startTime}"></div>
+                            </div>
+
+                            <!-- End Time -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Thời gian kết thúc <span
+                                        class="text-danger">*</span></label>
+                                <input type="datetime-local" th:field="*{endTime}"
+                                    th:class="'form-control' + (${#fields.hasErrors('endTime')} ? ' is-invalid' : '')" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}"
+                                    th:errors="*{endTime}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <!-- Reason -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Lý do / Mục đích</label>
+                                <textarea th:field="*{reason}"
+                                    th:class="'form-control' + (${#fields.hasErrors('reason')} ? ' is-invalid' : '')"
+                                    rows="3" maxlength="500" placeholder="Mô tả mục đích đặt phòng..."></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}"
+                                    th:errors="*{reason}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <!-- Status -->
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold">Trạng thái</label>
+                                <select th:field="*{status}"
+                                    th:class="'form-select' + (${#fields.hasErrors('status')} ? ' is-invalid' : '')">
+                                    <option value="PENDING">Chờ duyệt</option>
+                                    <option value="APPROVED">Đã duyệt</option>
+                                    <option value="REJECTED">Từ chối</option>
+                                    <option value="CANCELLED">Đã hủy</option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}"
+                                    th:errors="*{status}"></div>
+                            </div>
+
+                            <!-- Is Active -->
+                            <div class="col-md-3 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" th:field="*{isActive}"
+                                        id="isActiveCheck" />
+                                    <label class="form-check-label fw-semibold" for="isActiveCheck">Đang hoạt
+                                        động</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Blocked Room Warning -->
+                        <div id="blockedWarning" class="alert alert-danger mt-3 d-none">
+                            <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                            <strong>Cảnh báo:</strong> Phòng này hiện đang bị <b>KHÓA</b> trong khoảng thời gian bạn đã chọn. Vui lòng kiểm tra lại!
+                        </div>
+
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                <i class="bi bi-save me-1"></i>
+                                <span th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
+                            </button>
+                            <a th:href="@{/admin/schedule-overrides}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </th:block>
+
+    <th:block th:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function() {
+                const roomIdEl = $('#roomId');
+                const startTimeEl = $('#startTime');
+                const endTimeEl = $('#endTime');
+                const warningEl = $('#blockedWarning');
+                const btnSubmit = $('#btnSubmit');
+
+                function checkRoomBlock() {
+                    const roomId = roomIdEl.val();
+                    const startTime = startTimeEl.val();
+                    const endTime = endTimeEl.val();
+
+                    if (!roomId || !startTime || !endTime) {
+                        warningEl.addClass('d-none');
+                        btnSubmit.prop('disabled', false);
+                        return;
+                    }
+
+                    // Call API to check overlap
+                    const apiUrl = /*[[@{/admin/room-block-times/api/check-overlap}]]*/ '/admin/room-block-times/api/check-overlap';
+                    
+                    $.get(apiUrl, {
+                        roomId: roomId,
+                        startTime: startTime,
+                        endTime: endTime
+                    }, function(isBlocked) {
+                        if (isBlocked) {
+                            warningEl.removeClass('d-none');
+                            btnSubmit.prop('disabled', true);
+                            roomIdEl.addClass('is-invalid');
+                        } else {
+                            warningEl.addClass('d-none');
+                            btnSubmit.prop('disabled', false);
+                            if (!roomIdEl.hasClass('server-error')) {
+                                roomIdEl.removeClass('is-invalid');
+                            }
+                        }
+                    });
+                }
+
+                // Attach events
+                roomIdEl.on('change', checkRoomBlock);
+                startTimeEl.on('change', checkRoomBlock);
+                endTimeEl.on('change', checkRoomBlock);
+
+                // Initial check if editing
+                if (roomIdEl.val() && startTimeEl.val() && endTimeEl.val()) {
+                    checkRoomBlock();
+                }
+            });
+        </script>
+    </th:block>
+</body>
+
+</html>
