@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật thiết bị' : 'Thêm thiết bị', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/admin}">Trang quản trị</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/admin/equipments}">Thiết bị</a></li>
+        <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+      </ol>
+    </nav>
+
+    <div class="card shadow-sm border-0" style="max-width: 720px;">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-gear-fill me-2 text-primary"></i>
+          <span th:text="${isEdit} ? 'Cập nhật thiết bị' : 'Thêm thiết bị'"></span>
+        </h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/admin/equipments/save}" th:object="${equipment}" method="post" novalidate>
+          <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
+          <input type="hidden" name="isEdit" th:value="${isEdit}"/>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Mã thiết bị <span class="text-danger">*</span></label>
+              <input type="text" th:field="*{equipmentCode}"
+                     th:class="'form-control' + (${#fields.hasErrors('equipmentCode')} ? ' is-invalid' : '')"
+                     maxlength="50" placeholder="VD: TB001"
+                     th:readonly="${isEdit}"/>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('equipmentCode')}" th:errors="*{equipmentCode}"></div>
+              <div class="form-text" th:if="${isEdit}">Mã không thể thay đổi sau khi tạo.</div>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label fw-semibold">Tên thiết bị <span class="text-danger">*</span></label>
+              <input type="text" th:field="*{equipmentName}"
+                     th:class="'form-control' + (${#fields.hasErrors('equipmentName')} ? ' is-invalid' : '')"
+                     maxlength="150" placeholder="VD: Máy chiếu Epson EB-X41"/>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('equipmentName')}" th:errors="*{equipmentName}"></div>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Số serial</label>
+              <input type="text" th:field="*{serialNumber}"
+                     th:class="'form-control' + (${#fields.hasErrors('serialNumber')} ? ' is-invalid' : '')"
+                     maxlength="100" placeholder="VD: SN-2024-001"/>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('serialNumber')}" th:errors="*{serialNumber}"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Ngày mua</label>
+              <input type="date" th:field="*{purchaseDate}"
+                     th:class="'form-control' + (${#fields.hasErrors('purchaseDate')} ? ' is-invalid' : '')"/>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('purchaseDate')}" th:errors="*{purchaseDate}"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Trạng thái</label>
+              <select th:field="*{status}"
+                      th:class="'form-select' + (${#fields.hasErrors('status')} ? ' is-invalid' : '')">
+                <option value="">-- Chọn trạng thái --</option>
+                <option value="ACTIVE">Đang hoạt động</option>
+                <option value="BROKEN">Hỏng</option>
+                <option value="MAINTENANCE">Bảo trì</option>
+              </select>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phòng sử dụng</label>
+              <select th:field="*{roomId}"
+                      th:class="'form-select' + (${#fields.hasErrors('roomId')} ? ' is-invalid' : '')">
+                <option value="">-- Chưa phân phòng --</option>
+                <option th:each="r : ${rooms}"
+                        th:value="${r.id}"
+                        th:text="${r.roomCode + ' - ' + r.roomName}"></option>
+              </select>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('roomId')}" th:errors="*{roomId}"></div>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>
+              <span th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
+            </button>
+            <a th:href="@{/admin/equipments}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-lg me-1"></i> Hủy
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>
