@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/admin}">Trang quản trị</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/admin/students}">Sinh viên</a></li>
+        <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+      </ol>
+    </nav>
+
+    <div class="card shadow-sm border-0" style="max-width: 600px;">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-people-fill me-2 text-primary"></i>
+          <span th:text="${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên'"></span>
+        </h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/admin/students/save}" th:object="${student}" method="post" novalidate>
+          <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
+          <input type="hidden" name="isEdit" th:value="${isEdit}"/>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Tên sinh viên <span class="text-danger">*</span></label>
+            <input type="text" th:field="*{name}"
+                   th:class="'form-control' + (${#fields.hasErrors('name')} ? ' is-invalid' : '')"
+                   maxlength="150" placeholder="Nhập tên sinh viên"/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" th:field="*{email}"
+                   th:class="'form-control' + (${#fields.hasErrors('email')} ? ' is-invalid' : '')"
+                   maxlength="150" placeholder="VD: sv@school.edu.vn"/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i>
+              <span th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
+            </button>
+            <a th:href="@{/admin/students}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-lg me-1"></i> Hủy
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>
+
