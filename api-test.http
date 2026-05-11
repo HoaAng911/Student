@@ -1,0 +1,96 @@
+### API Test Script for QuanLyDaoTaoA (DYNAMIC VERSION)
+# Hướng dẫn: Nhấn Send Request từ trên xuống dưới.
+# Biến sẽ tự động lấy ID từ kết quả trả về của lệnh GET trước đó.
+
+@baseUrl = http://localhost:8080
+
+### ==========================================
+### 1. GRADE COMPONENTS (Thành phần điểm)
+### ==========================================
+
+# @name getAllGC
+GET {{baseUrl}}/api/grade-components/data
+Accept: application/json
+
+### Lấy ID của thành phần điểm đầu tiên
+@firstGCId = {{getAllGC.response.body[0].id}}
+@sampleSectionId = {{getAllGC.response.body[0].courseSectionId}}
+
+### Test tạo mới (Dùng SectionId thật lấy từ dữ liệu có sẵn)
+# @name createGC
+POST {{baseUrl}}/api/grade-components
+Content-Type: application/json
+
+{
+    "courseSectionId": "{{sampleSectionId}}",
+    "componentCode": "TEST_CODE",
+    "componentName": "Thành phần điểm Test",
+    "weightPercentage": 20.00,
+    "minScore": 0.00,
+    "maxScore": 10.00,
+    "isRequired": true,
+    "isActive": true
+}
+
+### Test xóa (Xóa chính cái mình vừa lấy được từ lệnh GET đầu tiên)
+DELETE {{baseUrl}}/api/grade-components/{{firstGCId}}
+
+
+### ==========================================
+### 2. GRADE SCALES (Thang điểm)
+### ==========================================
+
+### Lưu ý: Nếu Backend chưa có GET, hãy bỏ qua phần này
+# @name getAllScales
+# GET {{baseUrl}}/api/v1/grade-scales
+# Accept: application/json
+
+# @firstScaleId = {{getAllScales.response.body[0].id}}
+
+### Tạo mới thang điểm
+POST {{baseUrl}}/api/v1/grade-scales
+Content-Type: application/json
+
+{
+    "scaleCode": "SCALE_TEST",
+    "minScore": 5.00,
+    "maxScore": 10.00,
+    "letterGrade": "C",
+    "gpaValue": 2.00,
+    "isPass": true,
+    "isActive": true
+}
+
+
+### ==========================================
+### 3. STUDENT GRADES (Quản lý điểm sinh viên)
+### ==========================================
+
+# @name getAllStudentGrades
+GET {{baseUrl}}/api/v1/student-grades
+Accept: application/json
+
+### Lấy Registration ID thật từ dữ liệu
+@regId = {{getAllStudentGrades.response.body[0].registrationId}}
+
+### Xem điểm của sinh viên đó
+GET {{baseUrl}}/api/v1/student-grades/registration/{{regId}}
+
+
+### ==========================================
+### 4. GRADE STUDENT (Nghiệp vụ nhập điểm)
+### ==========================================
+
+# @name getGradesByStudent
+GET {{baseUrl}}/api/grade-students/student/{{getAllStudentGrades.response.body[0].studentId}}
+
+### Nhập điểm mới (Dùng StudentId và GCId thật)
+POST {{baseUrl}}/api/grade-students
+Content-Type: application/json
+
+{
+    "studentId": "{{getAllStudentGrades.response.body[0].studentId}}",
+    "gradeComponentId": "{{firstGCId}}",
+    "score": 9.0,
+    "notes": "Test nhập điểm tự động"
+}
