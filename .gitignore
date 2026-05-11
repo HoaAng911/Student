@@ -62,3 +62,9 @@ Thumbs.db
 # --- ENV & SENSITIVE ---
 .env
 .env.local
+# --- Automation Test Scripts & Docs ---
+*.js
+!package.json
+!package-lock.json
+*.md
+!README.md
