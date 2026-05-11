@@ -1,0 +1,191 @@
+<html xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout/layout :: layoutPage(pageTitle='Dashboard - Quản trị', content=~{:: content})}">
+
+<body>
+  <th:block th:fragment="content">
+    <div class="container-fluid">
+
+      <!-- Welcome Section -->
+      <div class="mb-4">
+        <div class="card border-0 overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px;">
+          <div class="card-body p-4 p-md-5 position-relative">
+            <div class="position-relative z-1">
+              <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill" style="background: rgba(59,130,246,0.15); font-size: .8rem; color: #93c5fd;">
+                <i class="bi bi-stars"></i> Dashboard
+              </div>
+              <h2 class="fw-bold text-white mb-2">Chào mừng trở lại, Admin! 👋</h2>
+              <p class="mb-0" style="color: #94a3b8; max-width: 520px;">Hệ thống quản lý đào tạo đang hoạt động ổn định. Kiểm tra các số liệu mới nhất bên dưới.</p>
+            </div>
+            <!-- Decorative -->
+            <div class="position-absolute" style="top: -30px; right: -30px; width: 200px; height: 200px; border-radius: 50%; background: rgba(59,130,246,0.08);"></div>
+            <div class="position-absolute" style="bottom: -40px; right: 80px; width: 140px; height: 140px; border-radius: 50%; background: rgba(139,92,246,0.06);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="row g-4 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card border-0 h-100 hover-translate-y">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="rounded-3 p-2" style="background: rgba(59,130,246,0.08);">
+                  <i class="bi bi-mortarboard fs-4" style="color: #3b82f6;"></i>
+                </div>
+                <span class="badge rounded-pill px-2" style="background: rgba(16,185,129,0.1); color: #10b981; font-size: .7rem;">+12%</span>
+              </div>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;">1,284</h3>
+              <p class="small mb-0" style="color: #94a3b8;">Tổng số sinh viên</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card border-0 h-100 hover-translate-y">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="rounded-3 p-2" style="background: rgba(139,92,246,0.08);">
+                  <i class="bi bi-list-stars fs-4" style="color: #8b5cf6;"></i>
+                </div>
+                <span class="badge rounded-pill px-2" style="background: rgba(148,163,184,0.1); color: #94a3b8; font-size: .7rem;">Ổn định</span>
+              </div>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;">45</h3>
+              <p class="small mb-0" style="color: #94a3b8;">Thành phần điểm</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card border-0 h-100 hover-translate-y">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="rounded-3 p-2" style="background: rgba(245,158,11,0.08);">
+                  <i class="bi bi-graph-up-arrow fs-4" style="color: #f59e0b;"></i>
+                </div>
+                <span class="badge rounded-pill px-2" style="background: rgba(239,68,68,0.1); color: #ef4444; font-size: .7rem;">-2%</span>
+              </div>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;">7.42</h3>
+              <p class="small mb-0" style="color: #94a3b8;">Điểm trung bình hệ thống</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card border-0 h-100 hover-translate-y">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="rounded-3 p-2" style="background: rgba(16,185,129,0.08);">
+                  <i class="bi bi-shield-check fs-4" style="color: #10b981;"></i>
+                </div>
+                <div class="spinner-grow spinner-grow-sm" style="color: #10b981; width: 8px; height: 8px;" role="status"></div>
+              </div>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;">99.9%</h3>
+              <p class="small mb-0" style="color: #94a3b8;">Uptime hệ thống</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions & Notifications -->
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card border-0 h-100">
+            <div class="card-header border-0 py-4">
+              <h6 class="fw-bold text-dark mb-0">Lối tắt quản lý</h6>
+            </div>
+            <div class="card-body pt-0">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <a th:href="@{/api/student-grades}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light">
+                    <div class="rounded-3 p-2 me-3" style="background: rgba(59,130,246,0.08);">
+                      <i class="bi bi-clipboard-data" style="color: #3b82f6;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-bold text-dark" style="font-size: .875rem;">Quản lý điểm</h6>
+                      <small style="color: #94a3b8;">Xem và nhập điểm sinh viên</small>
+                    </div>
+                    <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
+                  </a>
+                </div>
+                <div class="col-md-6">
+                  <a th:href="@{/api/students}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light">
+                    <div class="rounded-3 p-2 me-3" style="background: rgba(139,92,246,0.08);">
+                      <i class="bi bi-people" style="color: #8b5cf6;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-bold text-dark" style="font-size: .875rem;">Hồ sơ sinh viên</h6>
+                      <small style="color: #94a3b8;">Danh sách và thông tin chi tiết</small>
+                    </div>
+                    <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
+                  </a>
+                </div>
+                <div class="col-md-6">
+                  <a th:href="@{/api/grade-components}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light">
+                    <div class="rounded-3 p-2 me-3" style="background: rgba(16,185,129,0.08);">
+                      <i class="bi bi-list-stars" style="color: #10b981;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-bold text-dark" style="font-size: .875rem;">Thành phần điểm</h6>
+                      <small style="color: #94a3b8;">Cấu hình trọng số, điểm số</small>
+                    </div>
+                    <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
+                  </a>
+                </div>
+                <div class="col-md-6">
+                  <a th:href="@{/api/student-grades/add}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light">
+                    <div class="rounded-3 p-2 me-3" style="background: rgba(245,158,11,0.08);">
+                      <i class="bi bi-plus-circle" style="color: #f59e0b;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-bold text-dark" style="font-size: .875rem;">Nhập điểm mới</h6>
+                      <small style="color: #94a3b8;">Thêm bản ghi điểm nhanh</small>
+                    </div>
+                    <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card border-0 h-100">
+            <div class="card-header border-0 py-4">
+              <h6 class="fw-bold text-dark mb-0">Thông báo</h6>
+            </div>
+            <div class="card-body pt-0">
+              <div class="d-flex gap-3 mb-4">
+                <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(245,158,11,0.08);">
+                  <i class="bi bi-exclamation-triangle" style="color: #f59e0b;"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold" style="font-size: .85rem;">Kết thúc nhập điểm kỳ I</h6>
+                  <p class="small mb-0" style="color: #94a3b8;">Hạn cuối nhập điểm là 20/05/2026.</p>
+                </div>
+              </div>
+              <div class="d-flex gap-3 mb-4">
+                <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(16,185,129,0.08);">
+                  <i class="bi bi-patch-check" style="color: #10b981;"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold" style="font-size: .85rem;">Hệ thống đã cập nhật</h6>
+                  <p class="small mb-0" style="color: #94a3b8;">Phiên bản 2.0 đã được triển khai.</p>
+                </div>
+              </div>
+              <div class="d-flex gap-3">
+                <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(59,130,246,0.08);">
+                  <i class="bi bi-info-circle" style="color: #3b82f6;"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold" style="font-size: .85rem;">Tính năng mới</h6>
+                  <p class="small mb-0" style="color: #94a3b8;">Giao diện quản trị đã được nâng cấp.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</body>
+
+</html>

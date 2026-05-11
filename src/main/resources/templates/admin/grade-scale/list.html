@@ -1,0 +1,95 @@
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/layout :: layoutPage(pageTitle='Quản lý Thang điểm', content=~{:: content})}">
+
+<body>
+    <th:block th:fragment="content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Quản lý Thang điểm</h2>
+                    <p class="text-muted small mb-0">Thiết lập hệ thống quy đổi điểm chữ và GPA.</p>
+                </div>
+                <a href="/api/grade-scales/new" class="btn btn-primary shadow-sm px-4">
+                    <i class="bi bi-plus-lg me-2"></i>Thêm thang điểm
+                </a>
+            </div>
+
+            <!-- Glassmorphism Card -->
+            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Mã Thang điểm</th>
+                                    <th>Cận dưới (Hệ 10)</th>
+                                    <th>Cận trên (Hệ 10)</th>
+                                    <th class="text-center">Điểm chữ</th>
+                                    <th class="text-center">Giá trị GPA</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-end pe-4">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="gs : ${gradeScales}">
+                                    <td class="ps-4 fw-bold text-dark" th:text="${gs.scaleCode}"></td>
+                                    <td th:text="${gs.minScore}"></td>
+                                    <td th:text="${gs.maxScore}"></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info-subtle text-info fw-bold px-3 py-2"
+                                            th:text="${gs.letterGrade}" style="border-radius: 8px;"></span>
+                                    </td>
+                                    <td class="text-center fw-bold" th:text="${gs.gpaValue}"></td>
+                                    <td class="text-center">
+                                        <span th:if="${gs.isActive}"
+                                            class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2"
+                                            style="border-radius: 8px;">Đang dùng</span>
+                                        <span th:unless="${gs.isActive}"
+                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2"
+                                            style="border-radius: 8px;">Ngừng</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a th:href="@{/api/grade-scales/edit/{id}(id=${gs.id})}"
+                                                class="btn btn-sm btn-light border shadow-sm rounded-3">
+                                                <i class="bi bi-pencil-square text-primary"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-light border shadow-sm rounded-3"
+                                                th:data-id="${gs.id}" onclick="deleteGradeScale(this.getAttribute('data-id'))">
+                                                <i class="bi bi-trash text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(gradeScales)}">
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        Chưa có thang điểm nào được tạo.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function deleteGradeScale(id) {
+                if (confirm('Bạn có chắc chắn muốn xóa thang điểm này không?')) {
+                    fetch('/api/v1/grade-scales/' + id, {
+                        method: 'DELETE'
+                    }).then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Xóa thất bại. Vui lòng thử lại.');
+                        }
+                    });
+                }
+            }
+        </script>
+    </th:block>
+</body>
+
+</html>

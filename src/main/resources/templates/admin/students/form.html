@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang quản trị</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/api/students}" class="text-decoration-none">Sinh viên</a></li>
+        <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card border-0">
+          <div class="card-header d-flex align-items-center py-3">
+            <div class="p-2 rounded-3 me-3" style="background: rgba(59,130,246,0.08);">
+              <i class="bi bi-person-plus text-primary fs-4"></i>
+            </div>
+            <div>
+              <h5 class="mb-0 fw-bold text-dark" th:text="${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên mới'"></h5>
+              <p class="text-muted small mb-0">Nhập thông tin cá nhân của sinh viên</p>
+            </div>
+          </div>
+          <div class="card-body p-4">
+            <form th:action="@{/api/students/save}" th:object="${student}" method="post" novalidate>
+              <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
+              <input type="hidden" name="isEdit" th:value="${isEdit}"/>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Tên sinh viên <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                  <input type="text" th:field="*{name}"
+                         th:class="'form-control border-start-0' + (${#fields.hasErrors('name')} ? ' is-invalid' : '')"
+                         maxlength="150" placeholder="Nhập họ và tên sinh viên"/>
+                </div>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Email liên hệ</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                  <input type="email" th:field="*{email}"
+                         th:class="'form-control border-start-0' + (${#fields.hasErrors('email')} ? ' is-invalid' : '')"
+                         maxlength="150" placeholder="VD: sv@school.edu.vn"/>
+                </div>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+              </div>
+
+              <div class="d-flex align-items-center gap-3 mt-5 pt-3 border-top">
+                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3">
+                  <i class="bi bi-save me-2"></i>
+                  <span th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
+                </button>
+                <a th:href="@{/api/students}" class="btn btn-link text-secondary text-decoration-none">
+                  Hủy bỏ và quay lại
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${title} + ' – Quản lý lịch học'">Hệ thống</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --sidebar-width: 264px;
+      --sidebar-collapsed-width: 72px;
+      --header-height: 64px;
+      --sidebar-bg: #ffffff;
+      --sidebar-active-bg: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.06));
+      --sidebar-active-color: #3b82f6;
+      --sidebar-hover-bg: #f8fafc;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --radius-xl: 16px;
+      --radius-lg: 12px;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.03);
+      --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.04);
+    }
+
+    /* ===== RESET & BASE ===== */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: #f1f5f9;
+      color: #1e293b;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      height: var(--header-height);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1030;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .app-header .brand {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .app-header .brand i {
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      padding: 8px;
+      border-radius: 10px;
+    }
+    .btn-toggle-sidebar {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: .9rem;
+    }
+    .btn-toggle-sidebar:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .app-sidebar {
+      position: fixed;
+      top: var(--header-height);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      border-right: 1px solid #e2e8f0;
+      transition: var(--transition);
+      z-index: 1020;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .app-sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+      padding: 16px 8px;
+    }
+
+    .sidebar-label {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 20px 14px 10px;
+      letter-spacing: 1.2px;
+      transition: var(--transition);
+    }
+    .app-sidebar.collapsed .sidebar-label {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 14px;
+      margin: 2px 0;
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      color: #64748b;
+      font-size: .875rem;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      white-space: nowrap;
+    }
+    .sidebar-link .nav-icon {
+      font-size: 1.15rem;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sidebar-link:hover {
+      background: var(--sidebar-hover-bg);
+      color: #1e293b;
+    }
+    .sidebar-link.active {
+      background: var(--sidebar-active-bg);
+      color: var(--sidebar-active-color);
+      font-weight: 600;
+    }
+    .sidebar-link.active .nav-icon {
+      color: var(--sidebar-active-color);
+    }
+    .sidebar-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 25%; bottom: 25%;
+      width: 3px;
+      background: var(--sidebar-active-color);
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Collapsed: hide text, show tooltip */
+    .app-sidebar.collapsed .nav-text { display: none; }
+    .app-sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding: 12px;
+    }
+    .app-sidebar.collapsed .sidebar-link::after {
+      content: attr(data-label);
+      position: absolute;
+      left: calc(var(--sidebar-collapsed-width) + 8px);
+      background: #0f172a;
+      color: #f1f5f9;
+      font-size: .75rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-6px);
+      transition: var(--transition);
+      z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .app-sidebar.collapsed .sidebar-link:hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .app-main {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+    .app-main.sidebar-collapsed {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* ===== MODERN CARD ===== */
+    .card {
+      border: 1px solid #e8ecf1;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      transition: var(--transition);
+      background: #fff;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-card-hover);
+    }
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 20px 24px;
+    }
+
+    /* ===== TABLE ===== */
+    .table thead th {
+      background: #f8fafc;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      font-weight: 700;
+      border-top: none;
+      padding: 14px 16px;
+    }
+    .table tbody td {
+      padding: 14px 16px;
+      vertical-align: middle;
+      border-color: #f1f5f9;
+      font-size: .875rem;
+    }
+    .table tbody tr {
+      transition: background 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      border: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    }
+    .btn-dark {
+      background: #1e293b;
+      border: none;
+      font-weight: 600;
+    }
+    .btn-dark:hover {
+      background: #0f172a;
+    }
+
+    /* ===== FORM CONTROLS ===== */
+    .form-control:focus, .form-select:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-control, .form-select {
+      border-radius: 10px;
+      border-color: #e2e8f0;
+      padding: 10px 14px;
+      font-size: .875rem;
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      font-size: .85rem;
+    }
+    .breadcrumb-item a {
+      color: #64748b;
+      transition: color 0.2s;
+    }
+    .breadcrumb-item a:hover {
+      color: #3b82f6;
+    }
+    .breadcrumb-item.active {
+      color: #94a3b8;
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== UTILITIES ===== */
+    .transition-all { transition: var(--transition); }
+    .hover-translate-y:hover { transform: translateY(-4px); }
+    .hover-bg-light:hover { background: #f8fafc !important; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .app-main > .flex-grow-1 > * {
+      animation: fadeIn 0.35s ease-out;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    .app-sidebar::-webkit-scrollbar { width: 4px; }
+    .app-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .app-sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .app-sidebar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .app-sidebar { transform: translateX(-100%); }
+      .app-sidebar.collapsed { transform: translateX(-100%); }
+      .app-main { margin-left: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="app-header" th:fragment="header">
+  <!-- Toggle button -->
+  <button class="btn-toggle-sidebar me-3" id="sidebarToggle" title="Thu gọn / Mở rộng menu">
+    <i class="bi bi-layout-sidebar-inset"></i>
+  </button>
+  <!-- Brand -->
+  <a class="brand" th:href="@{/api}">
+    <i class="bi bi-calendar3 flex-shrink-0"></i>
+    <span class="brand-text">Quản lý lịch học</span>
+  </a>
+  <!-- Right actions -->
+  <div class="ms-auto d-flex align-items-center gap-3">
+    <a th:href="@{/}" class="btn btn-sm text-light text-decoration-none d-flex align-items-center gap-2" style="background: rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 14px; font-size: .8rem;">
+      <i class="bi bi-globe2"></i>
+      <span class="d-none d-md-inline">Trang chủ</span>
+    </a>
+    <div class="d-none d-md-flex align-items-center gap-2 text-white" style="font-size: .8rem;">
+      <div style="width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .7rem;">A</div>
+      <span style="color: #94a3b8;">Admin</span>
+    </div>
+  </div>
+</header>
+
+</body>
+</html>

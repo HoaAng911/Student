@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật thành phần điểm' : 'Thêm thành phần điểm', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a th:href="@{/admin}" class="text-decoration-none">Trang quản trị</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/api/grade-components}" class="text-decoration-none">Thành phần điểm</a></li>
+        <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0">
+          <div class="card-header d-flex align-items-center py-3">
+            <div class="p-2 rounded-3 me-3" style="background: rgba(99,102,241,0.08);">
+              <i class="bi bi-gear fs-4" style="color: #6366f1;"></i>
+            </div>
+            <div>
+              <h5 class="mb-0 fw-bold text-dark" th:text="${isEdit} ? 'Cập nhật thành phần điểm' : 'Thêm thành phần điểm'"></h5>
+              <p class="text-muted small mb-0">Cấu hình trọng số và điểm số cho loại thành phần</p>
+            </div>
+          </div>
+          <div class="card-body p-4">
+            <form id="gradeComponentForm" th:action="@{/api/grade-components/save-view}" th:object="${gradeComponent}" method="post" novalidate>
+              <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
+              <input type="hidden" name="isEdit" th:value="${isEdit}"/>
+
+              <div class="row g-4">
+                <!-- Course Section ID -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold">ID Lớp học phần (UUID) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                    <input type="text" th:field="*{courseSectionId}"
+                           th:class="'form-control border-start-0' + (${#fields.hasErrors('courseSectionId')} ? ' is-invalid' : '')"
+                           placeholder="Nhập UUID của lớp học phần"/>
+                  </div>
+                  <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('courseSectionId')}" th:errors="*{courseSectionId}"></div>
+                  <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Tạm thời nhập UUID của lớp học phần liên quan</small>
+                </div>
+
+                <!-- Mã & Tên -->
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Mã thành phần <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash text-muted"></i></span>
+                    <input type="text" th:field="*{componentCode}"
+                           th:class="'form-control border-start-0' + (${#fields.hasErrors('componentCode')} ? ' is-invalid' : '')"
+                           maxlength="20" placeholder="VD: CC, BT"/>
+                  </div>
+                  <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('componentCode')}" th:errors="*{componentCode}"></div>
+                </div>
+
+                <div class="col-md-8">
+                  <label class="form-label fw-semibold">Tên thành phần <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
+                    <input type="text" th:field="*{componentName}"
+                           th:class="'form-control border-start-0' + (${#fields.hasErrors('componentName')} ? ' is-invalid' : '')"
+                           maxlength="50" placeholder="VD: Chuyên cần, Cuối kỳ"/>
+                  </div>
+                  <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('componentName')}" th:errors="*{componentName}"></div>
+                </div>
+
+                <!-- Trọng số, Điểm min/max -->
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Trọng số <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-percent text-muted"></i></span>
+                    <input type="number" th:field="*{weightPercentage}"
+                           th:class="'form-control border-start-0' + (${#fields.hasErrors('weightPercentage')} ? ' is-invalid' : '')"
+                           min="0" max="100" step="0.01" placeholder="0-100"/>
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('weightPercentage')}" th:errors="*{weightPercentage}"></div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Điểm tối thiểu</label>
+                  <input type="number" th:field="*{minScore}"
+                         th:class="'form-control' + (${#fields.hasErrors('minScore')} ? ' is-invalid' : '')"
+                         min="0" max="10" step="0.1" placeholder="0"/>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('minScore')}" th:errors="*{minScore}"></div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Điểm tối đa</label>
+                  <input type="number" th:field="*{maxScore}"
+                         th:class="'form-control' + (${#fields.hasErrors('maxScore')} ? ' is-invalid' : '')"
+                         min="0" max="10" step="0.1" placeholder="10"/>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('maxScore')}" th:errors="*{maxScore}"></div>
+                </div>
+
+                <!-- Thứ tự -->
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Thứ tự hiển thị</label>
+                  <input type="number" th:field="*{inputOrder}" class="form-control" min="0" placeholder="0"/>
+                </div>
+
+                <!-- Toggle switches -->
+                <div class="col-md-4">
+                  <div class="p-3 border rounded-3 bg-light-subtle h-100 d-flex align-items-center">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" th:field="*{isRequired}" id="isRequired">
+                      <label class="form-check-label fw-medium" for="isRequired">Bắt buộc nhập</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 border rounded-3 bg-light-subtle h-100 d-flex align-items-center">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" th:field="*{isActive}" id="isActive">
+                      <label class="form-check-label fw-medium" for="isActive">Kích hoạt</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-3 mt-5 pt-3 border-top">
+                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3" id="btnSave">
+                  <i class="bi bi-save me-2"></i>
+                  <span id="btnText" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
+                  <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+                <a th:href="@{/api/grade-components}" class="btn btn-link text-secondary text-decoration-none">
+                  Hủy bỏ và quay lại
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>

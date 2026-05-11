@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface GradeComponentRepository extends JpaRepository<GradeComponent, UUID> {
-    List<GradeComponent> findByCourseClassIdOrderByInputOrderAsc(UUID courseClassId);
+    List<GradeComponent> findByCourseSectionIdOrderByInputOrderAsc(UUID courseSectionId);
 }

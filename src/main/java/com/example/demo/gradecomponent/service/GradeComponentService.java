@@ -18,8 +18,12 @@ public class GradeComponentService {
         return repository.findAll();
     }
 
-    public List<GradeComponent> getByClass(UUID classId) {
-        return repository.findByCourseClassIdOrderByInputOrderAsc(classId);
+    public List<GradeComponent> getBySection(UUID sectionId) {
+        return repository.findByCourseSectionIdOrderByInputOrderAsc(sectionId);
+    }
+
+    public GradeComponent getById(UUID id) {
+        return repository.findById(id).orElse(null);
     }
 
     public GradeComponent save(GradeComponent data) {

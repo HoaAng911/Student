@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Quản lý sinh viên', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang quản trị</a></li>
+          <li class="breadcrumb-item active">Sinh viên</li>
+        </ol>
+      </nav>
+
+      <div th:if="${success}" class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-check-circle-fill fs-5 me-3"></i>
+        <div th:text="${success}"></div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div class="card border-0">
+        <div class="card-header d-flex align-items-center justify-content-between py-3">
+          <div>
+            <h5 class="mb-1 fw-bold text-dark">Danh sách sinh viên</h5>
+            <p class="text-muted small mb-0">Quản lý hồ sơ và thông tin cá nhân sinh viên</p>
+          </div>
+          <a th:href="@{/api/students/add}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm transition-all">
+            <i class="bi bi-plus-lg me-2"></i>Thêm mới
+          </a>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="p-4 bg-light-subtle border-bottom">
+            <form th:action="@{/api/students}" method="get" class="row g-3">
+              <div class="col-12 col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0"
+                         placeholder="Tìm theo tên, email..."/>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-dark px-4">Lọc</button>
+              </div>
+              <div class="col-auto">
+                <a th:href="@{/api/students}" class="btn btn-outline-secondary px-3">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+              </div>
+            </form>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 60px;">#</th>
+                  <th>Tên sinh viên</th>
+                  <th>Email liên hệ</th>
+                  <th class="text-center" style="width: 140px;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${studentPage == null or #lists.isEmpty(studentPage.content)}">
+                  <td colspan="4" class="text-center py-5">
+                    <div class="py-4">
+                      <i class="bi bi-person-exclamation fs-1 text-muted d-block mb-3"></i>
+                      <p class="text-muted mb-0">Chưa có dữ liệu sinh viên nào.</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr th:each="s, stat : ${studentPage?.content}" class="transition-all">
+                  <td class="text-center text-muted font-monospace" th:text="${(currentPage ?: 0) * 10 + stat.count}"></td>
+                  <td class="fw-semibold text-dark" th:text="${s.name}"></td>
+                  <td class="text-muted" th:text="${s.email} ?: '-'"></td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                      <a th:href="@{/api/students/edit/{id}(id=${s.id})}"
+                         class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Chỉnh sửa">
+                        <i class="bi bi-pencil-square fs-5"></i>
+                      </a>
+                      <form th:action="@{/api/students/delete/{id}(id=${s.id})}" method="post" class="d-inline"
+                            onsubmit="return confirm('Bạn có chắc muốn xóa sinh viên này?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" title="Xóa">
+                          <i class="bi bi-trash3 fs-5"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 d-flex justify-content-between align-items-center" th:if="${studentPage != null and studentPage.totalElements > 0}">
+            <div class="text-muted small">
+              Tổng <strong class="text-dark" th:text="${studentPage.totalElements}"></strong> bản ghi
+              <span class="mx-2">•</span>
+              Trang <strong class="text-dark" th:text="${currentPage + 1}"></strong> / <span th:text="${totalPages}"></span>
+            </div>
+            <nav th:if="${totalPages > 1}">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                  <a class="page-link rounded-start-pill px-3"
+                     th:href="@{/api/students(keyword=${keyword}, page=${currentPage - 1}, size=10)}">
+                    <i class="bi bi-chevron-left"></i>
+                  </a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                  <a class="page-link px-3"
+                     th:href="@{/api/students(keyword=${keyword}, page=${i}, size=10)}"
+                     th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                  <a class="page-link rounded-end-pill px-3"
+                     th:href="@{/api/students(keyword=${keyword}, page=${currentPage + 1}, size=10)}">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</th:block>
+</body>
+</html>
+

@@ -6,8 +6,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
-@Table(name = "n8_grade_components")
+@Table(name = "n8_v3_grade_components")
+@SQLDelete(sql = "UPDATE n8_v3_grade_components SET deleted_at = CURRENT_TIMESTAMP WHERE id=?")
+@Where(clause = "deleted_at IS NULL")
 public class GradeComponent {
 
     @Id
@@ -16,13 +21,13 @@ public class GradeComponent {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "course_class_id", nullable = false)
-    private UUID courseClassId;
+    @Column(name = "course_section_id", nullable = false)
+    private UUID courseSectionId;
 
-    @Column(name = "component_code", length = 20, nullable = false)
+    @Column(name = "component_code", length = 50, nullable = false, columnDefinition = "nvarchar(50)")
     private String componentCode;
 
-    @Column(name = "component_name", length = 50, nullable = false)
+    @Column(name = "component_name", length = 50, nullable = false, columnDefinition = "nvarchar(50)")
     private String componentName;
 
     @Column(name = "weight_percentage", precision = 5, scale = 2, nullable = false)
@@ -55,6 +60,12 @@ public class GradeComponent {
     @Column(name = "updated_by")
     private UUID updatedBy;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
+
     // JPA Hooks
     @PrePersist
     protected void onCreate() { this.createdAt = LocalDateTime.now(); }
@@ -66,8 +77,8 @@ public class GradeComponent {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public UUID getCourseClassId() { return courseClassId; }
-    public void setCourseClassId(UUID courseClassId) { this.courseClassId = courseClassId; }
+    public UUID getCourseSectionId() { return courseSectionId; }
+    public void setCourseSectionId(UUID courseSectionId) { this.courseSectionId = courseSectionId; }
 
     public String getComponentCode() { return componentCode; }
     public void setComponentCode(String componentCode) { this.componentCode = componentCode; }
@@ -95,4 +106,10 @@ public class GradeComponent {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+
+    public UUID getDeletedBy() { return deletedBy; }
+    public void setDeletedBy(UUID deletedBy) { this.deletedBy = deletedBy; }
 }

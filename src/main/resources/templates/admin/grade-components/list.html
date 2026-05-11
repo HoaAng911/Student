@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Danh mục thành phần điểm', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid">
+
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang quản trị</a></li>
+          <li class="breadcrumb-item active">Thành phần điểm</li>
+        </ol>
+      </nav>
+
+      <div th:if="${success ?: param.success}" class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+        <i class="bi bi-check-circle-fill fs-5 me-3"></i>
+        <div th:text="${success ?: param.success}"></div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div class="card border-0">
+        <div class="card-header d-flex align-items-center justify-content-between py-3">
+          <div>
+            <h5 class="mb-1 fw-bold text-dark">Danh mục thành phần điểm</h5>
+            <p class="text-muted small mb-0">Cấu hình các loại điểm thành phần và trọng số tương ứng</p>
+          </div>
+          <a th:href="@{/api/grade-components/add}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm transition-all">
+            <i class="bi bi-plus-lg me-2"></i>Thêm mới
+          </a>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="p-4 bg-light-subtle border-bottom">
+            <form th:action="@{/api/grade-components}" method="get" class="row g-3">
+              <div class="col-12 col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0"
+                         placeholder="Tìm theo mã hoặc tên..."/>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-dark px-4">Lọc</button>
+              </div>
+              <div class="col-auto">
+                <a th:href="@{/api/grade-components}" class="btn btn-outline-secondary px-3">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+              </div>
+            </form>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 60px;">#</th>
+                  <th style="width: 120px;">Mã</th>
+                  <th>Tên thành phần</th>
+                  <th class="text-center">Trọng số</th>
+                  <th class="text-center">Min-Max</th>
+                  <th class="text-center">Thứ tự</th>
+                  <th class="text-center">Bắt buộc</th>
+                  <th class="text-center">Trạng thái</th>
+                  <th class="text-center" style="width: 140px;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(gradeComponents)}">
+                  <td colspan="9" class="text-center py-5">
+                    <div class="py-4">
+                      <i class="bi bi-list-check fs-1 text-muted d-block mb-3"></i>
+                      <p class="text-muted mb-0">Chưa có thành phần điểm nào được cấu hình.</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr th:each="gc, stat : ${gradeComponents}" th:id="'row-' + ${gc.id}" class="transition-all">
+                  <td class="text-center text-muted font-monospace" th:text="${stat.count}"></td>
+                  <td><span class="badge bg-secondary-subtle text-secondary fw-bold" th:text="${gc.componentCode}">CC</span></td>
+                  <td class="fw-semibold text-dark" th:text="${gc.componentName}"></td>
+                  <td class="text-center">
+                    <span class="fs-5 fw-bold text-primary" th:text="${gc.weightPercentage != null ? #numbers.formatDecimal(gc.weightPercentage, 1, 0) : '0'}">10</span><span class="text-primary small">%</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge rounded-pill bg-light text-dark border px-2" th:text="${gc.minScore ?: '0'}">0</span>
+                    <i class="bi bi-dash mx-1 text-muted"></i>
+                    <span class="badge rounded-pill bg-light text-dark border px-2" th:text="${gc.maxScore ?: '10'}">10</span>
+                  </td>
+                  <td class="text-center text-muted fw-medium" th:text="${gc.inputOrder}">0</td>
+                  <td class="text-center">
+                    <i th:if="${gc.isRequired}" class="bi bi-check-circle-fill text-success fs-5"></i>
+                    <i th:unless="${gc.isRequired}" class="bi bi-circle text-muted fs-5"></i>
+                  </td>
+                  <td class="text-center">
+                    <span th:if="${gc.isActive}" class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Kích hoạt</span>
+                    <span th:unless="${gc.isActive}" class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">Tạm ngưng</span>
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                      <a th:href="@{/api/grade-components/edit/{id}(id=${gc.id})}"
+                         class="btn btn-sm btn-outline-primary border-0 rounded-circle p-2" title="Chỉnh sửa">
+                        <i class="bi bi-pencil-square fs-5"></i>
+                      </a>
+                      <button type="button"
+                        class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" 
+                        th:data-id="${gc.id}"
+                        onclick="deleteComponent(this.getAttribute('data-id'))"
+                        title="Xóa cấu hình">
+                        <i class="bi bi-trash3 fs-5"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript for Fetch API -->
+    <script th:inline="javascript">
+      async function deleteComponent(id) {
+        if (!confirm('Bạn có chắc muốn xóa thành phần điểm này?')) return;
+
+        try {
+          const response = await fetch('/api/grade-components/' + id, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            const row = document.getElementById('row-' + id);
+            if (row) {
+              row.classList.add('table-danger');
+              row.style.opacity = '0';
+              setTimeout(() => row.remove(), 500);
+            }
+          } else {
+            const error = await response.text();
+            alert('Lỗi khi xóa: ' + error);
+          }
+        } catch (err) {
+          console.error('Fetch error:', err);
+          alert('Không thể kết nối tới server.');
+        }
+      }
+    </script>
+  </th:block>
+</body>
+</html>
+</th:block>
+</body>
+</html>

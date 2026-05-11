@@ -1,0 +1,143 @@
+<html xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout/layout :: layoutPage(pageTitle='Thêm/Sửa điểm sinh viên', content=~{:: content})}">
+
+<body>
+  <th:block th:fragment="content">
+    <div class="container-fluid">
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang quản trị</a></li>
+          <li class="breadcrumb-item"><a th:href="@{/api/student-grades}" class="text-decoration-none">Điểm sinh viên</a></li>
+          <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
+        </ol>
+      </nav>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex align-items-center py-3">
+              <div class="bg-primary-subtle p-2 rounded-3 me-3">
+                <i class="bi bi-clipboard-plus text-primary fs-4"></i>
+              </div>
+              <div>
+                <h5 class="mb-0 fw-bold text-dark" th:text="${isEdit} ? 'Cập nhật điểm' : 'Thêm điểm mới'"></h5>
+                <p class="text-muted small mb-0">Nhập thông tin chi tiết về điểm số của sinh viên</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <form id="gradeForm" th:object="${grade}" novalidate>
+                <input type="hidden" th:field="*{id}" id="gradeId" />
+
+                <div class="row g-4">
+                  <!-- Thành phần điểm -->
+                  <div class="col-md-7">
+                    <label class="form-label fw-semibold">Thành phần điểm <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
+                      <select th:field="*{gradeComponentId}" class="form-select border-start-0" required>
+                        <option value="">-- Chọn thành phần điểm --</option>
+                        <option th:each="gc : ${gradeComponents}" 
+                                th:value="${gc.id}" 
+                                th:text="${gc.componentName + ' (' + gc.componentCode + ')'}">
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Điểm số -->
+                  <div class="col-md-5">
+                    <label class="form-label fw-semibold">Điểm số <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-end-0"><i class="bi bi-123 text-muted"></i></span>
+                      <input th:field="*{score}" type="number" class="form-control border-start-0" min="0" max="10" step="0.25" placeholder="0.0" required />
+                    </div>
+                  </div>
+
+                  <!-- Registration ID -->
+                  <div class="col-md-12">
+                    <label class="form-label fw-semibold">Mã đăng ký (Registration ID)</label>
+                    <input th:field="*{registrationId}" class="form-control bg-light-subtle" type="text" placeholder="UUID hoặc mã định danh..." />
+                  </div>
+
+                  <!-- Options (Thi lại, Khóa) -->
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded-3 bg-light-subtle">
+                      <div class="form-check form-switch mb-0">
+                        <input th:field="*{isRetake}" type="checkbox" class="form-check-input" id="isRetake" />
+                        <label class="form-check-label fw-medium" for="isRetake">Đánh dấu là thi lại</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 border rounded-3 bg-light-subtle">
+                      <div class="form-check form-switch mb-0">
+                        <input th:field="*{isLocked}" type="checkbox" class="form-check-input" id="isLocked" />
+                        <label class="form-check-label fw-medium" for="isLocked">Khóa điểm sau khi nhập</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Ghi chú -->
+                  <div class="col-12">
+                    <label class="form-label fw-semibold">Ghi chú</label>
+                    <textarea th:field="*{note}" class="form-control" rows="3" placeholder="Thêm nhận xét hoặc ghi chú cần thiết..."></textarea>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 mt-5">
+                  <button type="submit" class="btn btn-primary px-4 py-2 rounded-3">
+                    <i class="bi bi-save me-2"></i>Lưu dữ liệu
+                  </button>
+                  <a th:href="@{/api/student-grades}" class="btn btn-link text-secondary text-decoration-none">
+                    Hủy bỏ và quay lại
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script th:inline="javascript">
+      document.getElementById('gradeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Chuyển đổi checkbox sang Boolean
+        data.isRetake = document.getElementById('isRetake').checked;
+        data.isLocked = document.getElementById('isLocked').checked;
+        data.isActive = true;
+
+        // Xử lý ID: Nếu trống thì xóa khỏi object để tránh lỗi convert UUID
+        if (!data.id || data.id === "") {
+          delete data.id;
+        }
+
+        const id = document.getElementById('gradeId').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/v1/student-grades/${id}` : '/api/v1/student-grades';
+
+        try {
+          const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (response.ok) {
+            window.location.href = '/api/student-grades?success=Lưu thành công!';
+          } else {
+            const errorText = await response.text();
+            alert('Lỗi khi lưu dữ liệu: ' + errorText);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Có lỗi xảy ra, vui lòng thử lại.');
+        }
+      });
+    </script>
+  </th:block>
+</body>
+</html>
