@@ -1,5 +1,5 @@
 # --- Giai đoạn 1: Build dự án ---
-FROM maven:3.9.4-eclipse-temurin-23 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy file cấu hình Maven trước để cache dependencies
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # --- Giai đoạn 2: Chạy ứng dụng ---
-FROM eclipse-temurin:23-jdk-jammy
+FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
 
 # Copy file jar đã build từ giai đoạn trước
