@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudentRepository extends JpaRepository<Student, UUID> {
     List<Student> findByFullnameContainingIgnoreCase(String fullname);
+    org.springframework.data.domain.Page<Student> findByFullnameContainingIgnoreCase(String fullname, org.springframework.data.domain.Pageable pageable);
+    java.util.Optional<Student> findByUserId(UUID userId);
 }

@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.users.model.entity.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    List<User> findByUsername(String username);
+    java.util.Optional<User> findByUsernameAndIsActiveTrue(String username);
 }

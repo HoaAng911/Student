@@ -13,25 +13,29 @@
     /* ===== CSS VARIABLES ===== */
     :root {
       --sidebar-width: 264px;
-      --sidebar-collapsed-width: 72px;
-      --header-height: 64px;
+      --sidebar-collapsed-width: 78px;
+      --header-height: 72px;
+      --primary-color: #5D5FEF;
+      --primary-hover: #4a4cdb;
+      --bg-body: #F5F7FA;
       --sidebar-bg: #ffffff;
-      --sidebar-active-bg: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.06));
-      --sidebar-active-color: #3b82f6;
+      --sidebar-active-bg: rgba(93, 95, 239, 0.1);
+      --sidebar-active-color: #5D5FEF;
       --sidebar-hover-bg: #f8fafc;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      --radius-xl: 16px;
+      --radius-xl: 18px;
       --radius-lg: 12px;
-      --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.03);
-      --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.04);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-card: 0 10px 15px -3px rgba(0,0,0,0.04), 0 4px 6px -2px rgba(0,0,0,0.02);
     }
 
     /* ===== RESET & BASE ===== */
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background: #f1f5f9;
-      color: #1e293b;
+      background: var(--bg-body);
+      color: #334155;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
@@ -39,44 +43,49 @@
     /* ===== HEADER ===== */
     .app-header {
       height: var(--header-height);
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+      background: #ffffff;
+      border-bottom: 1px solid #E2E8F0;
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 1030;
       display: flex;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 24px;
     }
     .app-header .brand {
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
+      color: #1e293b;
+      font-weight: 800;
+      font-size: 1.1rem;
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: var(--transition);
     }
     .app-header .brand i {
-      font-size: 1.2rem;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      padding: 8px;
+      font-size: 1.3rem;
+      color: #fff;
+      background: var(--primary-color);
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(93, 95, 239, 0.3);
     }
     .btn-toggle-sidebar {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #94a3b8;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
       padding: 8px 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       transition: var(--transition);
       font-size: .9rem;
     }
     .btn-toggle-sidebar:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #fff;
+      background: #e2e8f0;
+      color: var(--primary-color);
     }
 
     /* ===== SIDEBAR ===== */
@@ -145,7 +154,7 @@
     .sidebar-link.active {
       background: var(--sidebar-active-bg);
       color: var(--sidebar-active-color);
-      font-weight: 600;
+      font-weight: 700;
     }
     .sidebar-link.active .nav-icon {
       color: var(--sidebar-active-color);
@@ -153,10 +162,10 @@
     .sidebar-link.active::before {
       content: '';
       position: absolute;
-      left: 0; top: 25%; bottom: 25%;
-      width: 3px;
+      right: 0; top: 15%; bottom: 15%;
+      width: 4px;
       background: var(--sidebar-active-color);
-      border-radius: 0 4px 4px 0;
+      border-radius: 4px 0 0 4px;
     }
 
     /* Collapsed: hide text, show tooltip */
@@ -243,24 +252,29 @@
     }
 
     /* ===== BUTTONS ===== */
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      border: none;
+    .btn {
+      border-radius: 100px; /* Pill shape */
+      padding: 10px 24px;
       font-weight: 600;
       transition: var(--transition);
     }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #2563eb, #4f46e5);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-    }
-    .btn-dark {
-      background: #1e293b;
+    .btn-primary {
+      background: var(--primary-color);
       border: none;
-      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(93, 95, 239, 0.25);
     }
-    .btn-dark:hover {
-      background: #0f172a;
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(93, 95, 239, 0.35);
+    }
+    .btn-outline-primary {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+    .btn-outline-primary:hover {
+      background: var(--primary-color);
+      color: #fff;
     }
 
     /* ===== FORM CONTROLS ===== */
@@ -334,17 +348,32 @@
   <!-- Brand -->
   <a class="brand" th:href="@{/api}">
     <i class="bi bi-calendar3 flex-shrink-0"></i>
-    <span class="brand-text">Quản lý lịch học</span>
+    <span class="brand-text">Hệ thống Quản lý Đào tạo</span>
   </a>
   <!-- Right actions -->
-  <div class="ms-auto d-flex align-items-center gap-3">
-    <a th:href="@{/}" class="btn btn-sm text-light text-decoration-none d-flex align-items-center gap-2" style="background: rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 14px; font-size: .8rem;">
-      <i class="bi bi-globe2"></i>
-      <span class="d-none d-md-inline">Trang chủ</span>
-    </a>
-    <div class="d-none d-md-flex align-items-center gap-2 text-white" style="font-size: .8rem;">
-      <div style="width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .7rem;">A</div>
-      <span style="color: #94a3b8;">Admin</span>
+  <div class="ms-auto d-flex align-items-center gap-4">
+    <!-- Search bar (optional in image) -->
+    <form th:action="@{/api/students}" method="get" class="d-none d-lg-flex position-relative">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+      <input type="text" name="keyword" class="form-control ps-5 bg-light border-0" placeholder="Tìm kiếm sinh viên..." style="width: 280px; border-radius: 12px;">
+    </form>
+
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-link text-muted p-2 position-relative">
+            <i class="bi bi-bell fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="margin-left: -8px; margin-top: 8px;"></span>
+        </button>
+        
+        <div class="d-flex align-items-center gap-3 ps-3 border-start">
+          <div class="text-end d-none d-md-block">
+            <div class="fw-bold text-dark" style="font-size: .85rem;" th:text="${session.currentUser != null ? session.currentUser.username : 'Guest'}">User Name</div>
+            <div class="text-muted" style="font-size: .75rem;" th:text="${session.currentUser != null ? session.currentUser.roles[0].name : 'Khách'}">Quản trị viên</div>
+          </div>
+          <div style="width: 42px; height: 42px; border-radius: 12px; background: #EEF2FF; border: 2px solid #fff; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img th:if="${session.currentUser != null}" th:src="'https://ui-avatars.com/api/?name=' + ${session.currentUser.username} + '&background=5D5FEF&color=fff'" alt="avatar" />
+            <i th:unless="${session.currentUser != null}" class="bi bi-person-fill text-primary"></i>
+          </div>
+        </div>
     </div>
   </div>
 </header>

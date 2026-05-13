@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Chấm điểm Ma trận', content=~{:: content})}">
+<head>
+    <style>
+        :root {
+            --input-border-dirty: #F59E0B;
+            --input-bg-dirty: #FFFBEB;
+            --status-draft-bg: #EEF2FF;
+            --status-draft-color: #5D5FEF;
+            --status-submitted-bg: #E0F2FE;
+            --status-submitted-color: #0284C7;
+            --status-locked-bg: #F1F5F9;
+            --status-locked-color: #64748B;
+            --table-border: #1e293b;
+        }
+
+        .container-fluid {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .matrix-table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            border: 2px solid var(--table-border) !important;
+        }
+
+        .matrix-table thead th {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 0.05em !important;
+            border: 1px solid var(--table-border) !important;
+            padding: 1rem !important;
+        }
+
+        .matrix-table tbody td {
+            border: 1px solid var(--table-border) !important;
+            padding: 0.75rem !important;
+            vertical-align: middle !important;
+            transition: background 0.2s !important;
+        }
+
+        .matrix-table tbody tr:hover {
+            background-color: #f8fafc !important;
+        }
+
+        .score-input {
+            width: 64px !important;
+            height: 38px !important;
+            text-align: center !important;
+            border: 2px solid #E2E8F0 !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            color: #1E293B !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            background: #fff !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .score-input:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 4px rgba(93, 95, 239, 0.15) !important;
+            outline: none !important;
+            transform: scale(1.05) !important;
+        }
+
+        .score-input.dirty {
+            border-color: var(--input-border-dirty) !important;
+            background-color: var(--input-bg-dirty) !important;
+            color: #B45309 !important;
+        }
+
+        .score-input:read-only {
+            background-color: #F1F5F9 !important;
+            border-color: #E2E8F0 !important;
+            color: #94A3B8 !important;
+            cursor: not-allowed !important;
+        }
+
+        .final-score-col {
+            background-color: #F8FAFC !important;
+            font-weight: 800 !important;
+        }
+
+        .status-badge {
+            font-size: 0.65rem !important;
+            padding: 4px 12px !important;
+            border-radius: 100px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.02em !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+        }
+
+        .status-badge.draft { background: var(--status-draft-bg) !important; color: var(--status-draft-color) !important; }
+        .status-badge.submitted { background: var(--status-submitted-bg) !important; color: var(--status-submitted-color) !important; }
+        .status-badge.locked { background: var(--status-locked-bg) !important; color: var(--status-locked-color) !important; }
+
+        .floating-action-bar {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 1000 !important;
+            background: #1E293B !important;
+            padding: 14px 28px !important;
+            border-radius: 100px !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 20px !important;
+            color: #fff !important;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .avatar-cell {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 12px !important;
+            background: #EEF2FF !important;
+            color: #5D5FEF !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+            border: 2px solid #fff !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<th:block th:fragment="content">
+    <style>
+        :root {
+            --input-border-dirty: #F59E0B;
+            --input-bg-dirty: #FFFBEB;
+            --status-draft-bg: #EEF2FF;
+            --status-draft-color: #5D5FEF;
+            --status-submitted-bg: #E0F2FE;
+            --status-submitted-color: #0284C7;
+            --status-locked-bg: #F1F5F9;
+            --status-locked-color: #64748B;
+            --table-border: #e2e8f0;
+        }
+
+        .container-fluid {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .matrix-table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            border: 2px solid var(--table-border) !important;
+        }
+
+        .matrix-table thead th {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 0.05em !important;
+            border: 1px solid var(--table-border) !important;
+            padding: 1rem !important;
+        }
+
+        .matrix-table tbody td {
+            border: 1px solid var(--table-border) !important;
+            padding: 0.75rem !important;
+            vertical-align: middle !important;
+            transition: background 0.2s !important;
+        }
+
+        .matrix-table tbody tr:hover {
+            background-color: #f8fafc !important;
+        }
+
+        .score-input {
+            width: 64px !important;
+            height: 38px !important;
+            text-align: center !important;
+            border: 2px solid #E2E8F0 !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            color: #1E293B !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            background: #fff !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .score-input:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 4px rgba(93, 95, 239, 0.15) !important;
+            outline: none !important;
+            transform: scale(1.05) !important;
+        }
+
+        .score-input.dirty {
+            border-color: var(--input-border-dirty) !important;
+            background-color: var(--input-bg-dirty) !important;
+            color: #B45309 !important;
+        }
+
+        .score-input:read-only {
+            background-color: #F1F5F9 !important;
+            border-color: #E2E8F0 !important;
+            color: #94A3B8 !important;
+            cursor: not-allowed !important;
+        }
+
+        .final-score-col {
+            background-color: #F8FAFC !important;
+            font-weight: 800 !important;
+        }
+
+        .status-badge {
+            font-size: 0.65rem !important;
+            padding: 4px 12px !important;
+            border-radius: 100px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.02em !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+        }
+
+        .status-badge.draft { background: var(--status-draft-bg) !important; color: var(--status-draft-color) !important; }
+        .status-badge.submitted { background: var(--status-submitted-bg) !important; color: var(--status-submitted-color) !important; }
+        .status-badge.locked { background: var(--status-locked-bg) !important; color: var(--status-locked-color) !important; }
+
+        .floating-action-bar {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 1000 !important;
+            background: #1E293B !important;
+            padding: 14px 28px !important;
+            border-radius: 100px !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 20px !important;
+            color: #fff !important;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .avatar-cell {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 12px !important;
+            background: #EEF2FF !important;
+            color: #5D5FEF !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+            border: 2px solid #fff !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="#">Grading</a></li>
+                        <li class="breadcrumb-item active">Matrix</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-800 text-dark mb-0 d-flex align-items-center gap-3">
+                    <span th:text="${report.courseName}">Advanced Web Development</span>
+                    <span class="badge bg-light text-primary border rounded-pill" style="font-size: 0.8rem;">Fall 2023 Semester</span>
+                </h2>
+            </div>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-arrow-up"></i> Export CSV
+                </button>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-check2-circle"></i> Final Submission
+                </button>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-card">
+            <div class="card-header bg-white py-4 px-4 d-flex justify-content-between align-items-center border-0">
+                <div>
+                    <h5 class="mb-1 fw-800 text-dark">Student Performance Matrix</h5>
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Edit scores directly in cells. Changes are tracked automatically.</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" class="form-control form-control-sm ps-5 bg-light border-0" placeholder="Tìm kiếm sinh viên..." style="width: 200px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover matrix-table mb-0" id="gradingMatrix">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 60px;">#</th>
+                                <th>Họ và Tên</th>
+                                <th th:each="header : ${report.headers}" class="text-center">
+                                    <div th:text="${header.componentName}">Midterm</div>
+                                    <div class="text-muted fw-normal" style="font-size: 0.65rem;" th:text="${(header.weightPercentage ?: '0') + '% Trọng số'}">30% Trọng số</div>
+                                </th>
+                                <th class="text-center">Điểm tổng kết</th>
+                                <th class="text-center">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row, stat : ${report.rows}" th:data-registration-id="${row.registrationId}">
+                                <td class="text-center text-muted font-monospace" style="font-size: 0.8rem;" th:text="${stat.count}">01</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-cell" th:text="${(#strings.isEmpty(row.firstName) ? '?' : #strings.substring(row.firstName,0,1)) + (#strings.isEmpty(row.lastName) ? '?' : #strings.substring(row.lastName,0,1))}">JS</div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.9rem;" th:text="${(row.firstName ?: '') + ' ' + (row.lastName ?: '')}">Julian Sterling</div>
+                                            <div class="text-muted font-monospace" style="font-size: 0.75rem;" th:text="${row.studentCode}">EDU-2024-8891</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td th:each="header : ${report.headers}" class="text-center">
+                                    <th:block th:each="grade : ${row.grades}" th:if="${grade.gradeComponentId == header.id}">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <input type="number" step="0.1" min="0" max="10"
+                                                   class="score-input"
+                                                   th:value="${grade.score}"
+                                                   th:data-component-id="${header.id}"
+                                                   th:data-original-value="${grade.score}"
+                                                   th:readonly="${grade.isLocked}"
+                                                   onchange="markDirty(this)">
+                                        </div>
+                                    </th:block>
+                                </td>
+
+                                <td class="text-center final-score-col">
+                                    <div class="fw-bold fs-5" 
+                                         th:classappend="${row.gradeLetter == 'A' ? 'text-success' : (row.gradeLetter == 'F' ? 'text-danger' : 'text-primary')}"
+                                         th:text="${row.gradeLetter}">A</div>
+                                    <div class="text-muted" style="font-size: 0.65rem;" th:text="${row.finalScore + ' / 10'}">9.2 / 10</div>
+                                </td>
+                                <td class="text-center">
+                                    <th:block th:each="grade : ${row.grades}" th:if="${stat.first}"> <!-- Display overall row status based on components or just summary -->
+                                    </th:block>
+                                    <span class="status-badge" th:classappend="draft">
+                                        <i class="bi bi-dot fs-4"></i> Nháp
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white py-3 px-4 d-flex justify-content-between align-items-center border-0">
+                <div class="text-muted small">Showing <span th:text="${report.rows.size()}">20</span> of <span th:text="${report.rows.size()}">20</span> students</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link border-0" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link border-0 rounded-3 mx-1" href="#" style="background: var(--primary-color);">1</a></li>
+                        <li class="page-item"><a class="page-link border-0 rounded-3 mx-1" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link border-0" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Bar -->
+    <div id="floatingBar" class="floating-action-bar d-none">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning text-dark rounded-circle p-1" id="dirtyCount">0</span>
+            <span class="fw-bold">Thay đổi chưa lưu</span>
+        </div>
+        <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1);"></div>
+        <button id="saveAllBtn" class="btn btn-primary btn-sm px-4 rounded-pill">
+            <i class="bi bi-save2 me-2"></i> LƯU TẤT CẢ THAY ĐỔI
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="saveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>Đã lưu điểm thành công!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let dirtyRows = new Set();
+
+        function markDirty(input) {
+            const originalValue = input.getAttribute('data-original-value');
+            if (parseFloat(input.value) !== parseFloat(originalValue)) {
+                input.classList.add('dirty');
+            } else {
+                input.classList.remove('dirty');
+            }
+            
+            const dirtyInputs = document.querySelectorAll('.score-input.dirty');
+            const floatingBar = document.getElementById('floatingBar');
+            const dirtyCount = document.getElementById('dirtyCount');
+            
+            if (dirtyInputs.length > 0) {
+                floatingBar.classList.remove('d-none');
+                dirtyCount.innerText = dirtyInputs.length;
+            } else {
+                floatingBar.classList.add('d-none');
+            }
+        }
+
+        document.getElementById('saveAllBtn').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
+
+            const updates = [];
+            document.querySelectorAll('.score-input.dirty').forEach(input => {
+                updates.push({
+                    registrationId: input.closest('tr').getAttribute('data-registration-id'),
+                    gradeComponentId: input.getAttribute('data-component-id'),
+                    score: input.value
+                });
+            });
+
+            try {
+                const response = await fetch('/api/v1/student-grades/matrix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+
+                if (!response.ok) throw new Error('Failed to save');
+
+                // Thành công
+                const toast = new bootstrap.Toast(document.getElementById('saveToast'));
+                toast.show();
+                setTimeout(() => location.reload(), 1500);
+
+            } catch (error) {
+                console.error('Error saving grades:', error);
+                alert('Có lỗi xảy ra khi lưu điểm!');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-save me-2"></i>Lưu tất cả thay đổi';
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

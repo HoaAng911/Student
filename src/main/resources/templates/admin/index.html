@@ -13,8 +13,11 @@
               <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill" style="background: rgba(59,130,246,0.15); font-size: .8rem; color: #93c5fd;">
                 <i class="bi bi-stars"></i> Dashboard
               </div>
-              <h2 class="fw-bold text-white mb-2">Chào mừng trở lại, Admin! 👋</h2>
-              <p class="mb-0" style="color: #94a3b8; max-width: 520px;">Hệ thống quản lý đào tạo đang hoạt động ổn định. Kiểm tra các số liệu mới nhất bên dưới.</p>
+              <h2 class="fw-bold text-white mb-2" th:text="${'Chào mừng trở lại, ' + displayName + '! 👋'}">Chào mừng trở lại, Admin! 👋</h2>
+              <p class="mb-0" style="color: #94a3b8; max-width: 520px;">
+                <span th:if="${userRole == 'ADMIN'}">Hệ thống quản lý đào tạo đang hoạt động ổn định. Kiểm tra các số liệu mới nhất bên dưới.</span>
+                <span th:if="${userRole == 'TEACHER'}">Chúc bạn một ngày làm việc hiệu quả! Dưới đây là danh sách các lớp học phần bạn đang phụ trách.</span>
+              </p>
             </div>
             <!-- Decorative -->
             <div class="position-absolute" style="top: -30px; right: -30px; width: 200px; height: 200px; border-radius: 50%; background: rgba(59,130,246,0.08);"></div>
@@ -23,18 +26,18 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
-      <div class="row g-4 mb-4">
+      <!-- Stats Grid (Chỉ hiện cho ADMIN) -->
+      <div class="row g-4 mb-4" th:if="${userRole == 'ADMIN'}">
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="card border-0 h-100 hover-translate-y">
             <div class="card-body p-4">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="rounded-3 p-2" style="background: rgba(59,130,246,0.08);">
-                  <i class="bi bi-mortarboard fs-4" style="color: #3b82f6;"></i>
+                   <i class="bi bi-mortarboard fs-4" style="color: #3b82f6;"></i>
                 </div>
-                <span class="badge rounded-pill px-2" style="background: rgba(16,185,129,0.1); color: #10b981; font-size: .7rem;">+12%</span>
+                <span class="badge rounded-pill px-2" style="background: rgba(16,185,129,0.1); color: #10b981; font-size: .7rem;">Hiện có</span>
               </div>
-              <h3 class="fw-bold mb-1" style="color: #1e293b;">1,284</h3>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;" th:text="${totalStudents}">1,284</h3>
               <p class="small mb-0" style="color: #94a3b8;">Tổng số sinh viên</p>
             </div>
           </div>
@@ -45,16 +48,15 @@
             <div class="card-body p-4">
               <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="rounded-3 p-2" style="background: rgba(139,92,246,0.08);">
-                  <i class="bi bi-list-stars fs-4" style="color: #8b5cf6;"></i>
+                  <i class="bi bi-book fs-4" style="color: #8b5cf6;"></i>
                 </div>
-                <span class="badge rounded-pill px-2" style="background: rgba(148,163,184,0.1); color: #94a3b8; font-size: .7rem;">Ổn định</span>
               </div>
-              <h3 class="fw-bold mb-1" style="color: #1e293b;">45</h3>
-              <p class="small mb-0" style="color: #94a3b8;">Thành phần điểm</p>
+              <h3 class="fw-bold mb-1" style="color: #1e293b;" th:text="${totalSections}">45</h3>
+              <p class="small mb-0" style="color: #94a3b8;">Lớp học phần</p>
             </div>
           </div>
         </div>
-
+        
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="card border-0 h-100 hover-translate-y">
             <div class="card-body p-4">
@@ -62,10 +64,9 @@
                 <div class="rounded-3 p-2" style="background: rgba(245,158,11,0.08);">
                   <i class="bi bi-graph-up-arrow fs-4" style="color: #f59e0b;"></i>
                 </div>
-                <span class="badge rounded-pill px-2" style="background: rgba(239,68,68,0.1); color: #ef4444; font-size: .7rem;">-2%</span>
               </div>
               <h3 class="fw-bold mb-1" style="color: #1e293b;">7.42</h3>
-              <p class="small mb-0" style="color: #94a3b8;">Điểm trung bình hệ thống</p>
+              <p class="small mb-0" style="color: #94a3b8;">GPA Trung bình</p>
             </div>
           </div>
         </div>
@@ -77,12 +78,63 @@
                 <div class="rounded-3 p-2" style="background: rgba(16,185,129,0.08);">
                   <i class="bi bi-shield-check fs-4" style="color: #10b981;"></i>
                 </div>
-                <div class="spinner-grow spinner-grow-sm" style="color: #10b981; width: 8px; height: 8px;" role="status"></div>
               </div>
               <h3 class="fw-bold mb-1" style="color: #1e293b;">99.9%</h3>
-              <p class="small mb-0" style="color: #94a3b8;">Uptime hệ thống</p>
+              <p class="small mb-0" style="color: #94a3b8;">Trạng thái hệ thống</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Teacher's Classes Section (Chỉ hiện cho TEACHER) -->
+      <div class="row g-4 mb-4" th:if="${userRole == 'TEACHER'}">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 py-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded-3" style="background: rgba(59,130,246,0.1);">
+                            <i class="bi bi-journal-bookmark-fill text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Lớp học phần đang dạy</h5>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 py-3 text-secondary small text-uppercase fw-bold">Mã lớp</th>
+                                    <th class="py-3 text-secondary small text-uppercase fw-bold">Tên học phần</th>
+                                    <th class="py-3 text-secondary small text-uppercase fw-bold text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="section : ${mySections}">
+                                    <td class="ps-4 fw-medium text-dark" th:text="${section.code}">CS101</td>
+                                    <td th:text="${section.name}">Lập trình Java</td>
+                                    <td class="text-center pe-4">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a th:href="@{/api/student-grades/matrix-grading/{id}(id=${section.id})}" 
+                                               class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                <i class="bi bi-grid-3x3-gap me-1"></i> Chấm điểm
+                                            </a>
+                                            <a th:href="@{/api/student-grades/course-section/{id}(id=${section.id})}" 
+                                               class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                                <i class="bi bi-file-earmark-bar-graph me-1"></i> Báo cáo
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(mySections)}">
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        Bạn hiện chưa phụ trách lớp học phần nào.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
 
@@ -131,6 +183,19 @@
                     <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
                   </a>
                 </div>
+                <div class="col-md-6" th:if="${demoSectionId != null}">
+                  <a th:href="@{/api/student-grades/course-section/{id}(id=${demoSectionId})}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light shadow-sm bg-white">
+                    <div class="rounded-3 p-2 me-3" style="background: rgba(16,185,129,0.08);">
+                      <i class="bi bi-grid-3x3-gap" style="color: #10b981;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-bold text-dark" style="font-size: .875rem;">Báo cáo điểm lớp</h6>
+                      <small style="color: #94a3b8;">Xem bảng điểm ma trận lớp hiện tại</small>
+                    </div>
+                    <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
+                  </a>
+                </div>
+
                 <div class="col-md-6">
                   <a th:href="@{/api/student-grades/add}" class="d-flex align-items-center p-3 border rounded-3 text-decoration-none transition-all hover-bg-light">
                     <div class="rounded-3 p-2 me-3" style="background: rgba(245,158,11,0.08);">
@@ -143,6 +208,7 @@
                     <i class="bi bi-chevron-right" style="color: #cbd5e1;"></i>
                   </a>
                 </div>
+
               </div>
             </div>
           </div>

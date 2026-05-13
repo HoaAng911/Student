@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "test:auth": "node tests/scenarios/auth.test.js",
+    "test:grade": "node tests/scenarios/grade-component.test.js",
+    "test:matrix": "node tests/scenarios/matrix-grading.test.js",
+    "test:all": "npm run test:auth && npm run test:grade && npm run test:matrix"
+  },
   "dependencies": {
     "selenium-webdriver": "^4.43.0"
   }

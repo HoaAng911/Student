@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Bảng điểm lớp học phần', content=~{:: content})}">
+<head>
+    <style>
+        :root {
+            --score-high: #4F46E5;
+            --score-mid: #0891B2;
+            --score-low: #E11D48;
+            --table-border: #1e293b; /* Màu tối hẳn để chắc chắn nhìn thấy */
+        }
+
+        .grade-report-container {
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Distinct Header Section */
+        .glass-header {
+            background: #ffffff !important;
+            border: 2px solid var(--table-border) !important;
+            border-radius: var(--radius-xl) !important;
+            padding: 2rem !important;
+            margin-bottom: 2rem !important;
+            box-shadow: var(--shadow-card) !important;
+        }
+
+        /* Modern Table Card */
+        .report-card {
+            border: 2px solid var(--table-border) !important;
+            border-radius: var(--radius-xl) !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-card) !important;
+            background: #fff !important;
+        }
+
+        .matrix-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: none !important;
+        }
+
+        .matrix-table thead th {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.05em !important;
+            padding: 1.25rem 1rem !important;
+            border: 1px solid var(--table-border) !important; /* Force border */
+        }
+
+        .matrix-table tbody td {
+            padding: 0.75rem 1rem !important;
+            vertical-align: middle !important;
+            border: 1px solid var(--table-border) !important; /* Force border */
+            font-size: 0.9rem !important;
+            color: #334155 !important;
+        }
+
+        .matrix-table tbody tr:hover {
+            background-color: #f8fafc !important;
+        }
+
+        /* Score Badges */
+        .score-badge {
+            display: inline-block !important;
+            padding: 0.25rem 0.75rem !important;
+            border-radius: 100px !important;
+            font-weight: 800 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+        }
+
+        .score-excellent { background: #4F46E5 !important; color: #fff !important; }
+        .score-good { background: #0891B2 !important; color: #fff !important; }
+        .score-bad { background: #E11D48 !important; color: #fff !important; }
+
+        .final-score {
+            font-weight: 900 !important;
+            font-size: 1.2rem !important;
+            color: var(--primary-color) !important;
+        }
+
+        /* Avatar Circle */
+        .student-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--sidebar-active-bg);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .btn-action-custom {
+            border-radius: 12px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-action-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .glass-header, .report-card { box-shadow: none; border: 1px solid #ddd; }
+            .matrix-table th, .matrix-table td { border: 1px solid #000 !important; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<th:block th:fragment="content">
+    <style>
+        :root {
+            --score-high: #4F46E5;
+            --score-mid: #0891B2;
+            --score-low: #E11D48;
+            --table-border: #e2e8f0;
+        }
+
+        .grade-report-container {
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .glass-header {
+            background: #ffffff !important;
+            border: 2px solid var(--table-border) !important;
+            border-radius: var(--radius-xl) !important;
+            padding: 2rem !important;
+            margin-bottom: 2rem !important;
+            box-shadow: var(--shadow-card) !important;
+        }
+
+        .report-card {
+            border: 2px solid var(--table-border) !important;
+            border-radius: var(--radius-xl) !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-card) !important;
+            background: #fff !important;
+        }
+
+        .matrix-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: none !important;
+        }
+
+        .matrix-table thead th {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.05em !important;
+            padding: 1.25rem 1rem !important;
+            border: 1px solid var(--table-border) !important;
+        }
+
+        .matrix-table tbody td {
+            padding: 0.75rem 1rem !important;
+            vertical-align: middle !important;
+            border: 1px solid var(--table-border) !important;
+            font-size: 0.9rem !important;
+            color: #334155 !important;
+        }
+
+        .matrix-table tbody tr:hover {
+            background-color: #f8fafc !important;
+        }
+
+        .score-badge {
+            display: inline-block !important;
+            padding: 0.25rem 0.75rem !important;
+            border-radius: 100px !important;
+            font-weight: 800 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+        }
+
+        .score-excellent { background: #4F46E5 !important; color: #fff !important; }
+        .score-good { background: #0891B2 !important; color: #fff !important; }
+        .score-bad { background: #E11D48 !important; color: #fff !important; }
+
+        .final-score {
+            font-weight: 900 !important;
+            font-size: 1.2rem !important;
+            color: #5D5FEF !important;
+        }
+
+        .student-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(93, 95, 239, 0.1);
+            color: #5D5FEF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .btn-action-custom {
+            border-radius: 12px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-action-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff !important; }
+            .glass-header, .report-card { box-shadow: none !important; border: 1px solid #000 !important; }
+            .matrix-table th, .matrix-table td { border: 1px solid #000 !important; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <div class="grade-report-container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="no-print mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/api}">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Báo cáo điểm lớp</li>
+            </ol>
+        </nav>
+
+        <!-- Glass Header -->
+        <div class="glass-header d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-primary mb-2" style="border-radius: 6px; padding: 5px 10px;">REPORT</span>
+                <h2 class="fw-800 text-dark mb-1" th:text="${report.courseName}">LẬP TRÌNH JAVA NÂNG CAO - ST23D</h2>
+                <div class="d-flex align-items-center gap-3 text-muted small">
+                    <span><i class="bi bi-calendar-event me-1"></i> Học kỳ 1 - Năm học 2023-2024</span>
+                    <span><i class="bi bi-people me-1"></i> <span th:text="${report.rows.size()}">0</span> Sinh viên</span>
+                </div>
+            </div>
+            <div class="no-print d-flex gap-2">
+                <a th:href="@{/api/student-grades/export/course-section/{id}(id=${report.courseSectionId})}" 
+                   class="btn btn-outline-dark btn-action-custom">
+                    <i class="bi bi-file-earmark-excel me-1 text-success"></i> Xuất Excel
+                </a>
+                <button onclick="window.print()" class="btn btn-dark btn-action-custom">
+                    <i class="bi bi-printer me-1"></i> In bảng điểm
+                </button>
+            </div>
+        </div>
+
+        <!-- Modern Table -->
+        <div class="report-card">
+            <div class="table-responsive">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 50px;">#</th>
+                            <th style="width: 110px;">Mã SV</th>
+                            <th>Họ và tên lót</th>
+                            <th style="width: 80px;">Tên</th>
+                            <th class="text-center" style="width: 110px;">Ngày sinh</th>
+                            <th class="text-center" style="width: 80px;">Lớp</th>
+                            
+                            <!-- Dynamic Score Headers -->
+                            <th th:each="header : ${report.headers}" 
+                                class="text-center"
+                                style="width: 70px;"
+                                th:text="${header.componentCode}">
+                            </th>
+                            
+                            <th class="text-center" style="width: 90px; background-color: #F1F5F9;">Tổng kết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row, stat : ${report.rows}">
+                            <td class="text-center text-muted font-monospace" th:text="${stat.count}">1</td>
+                            <td class="fw-bold text-primary font-monospace" th:text="${row.studentCode}">21001007</td>
+                            <td th:text="${row.firstName}">Ngô Thanh</td>
+                            <td class="fw-bold" th:text="${row.lastName}">Hằng</td>
+                            <td class="text-center small text-muted" th:text="${row.dob}">01/01/2003</td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border" th:text="${row.className ?: 'N/A'}">ST23D</span>
+                            </td>
+                            
+                            <!-- Scores with Color Badges -->
+                            <td th:each="grade : ${row.grades}" class="text-center">
+                                <span th:if="${grade.score != null}" 
+                                      class="score-badge"
+                                      th:classappend="${grade.score >= 8.5 ? 'score-excellent' : (grade.score < 5.0 ? 'score-bad' : 'score-good')}"
+                                      th:text="${#numbers.formatDecimal(grade.score, 1, 1)}">
+                                    7.0
+                                </span>
+                                <span th:unless="${grade.score != null}" class="text-muted">-</span>
+                            </td>
+                            
+                            <!-- Final Score Highlight -->
+                            <td class="text-center" style="background-color: #F8FAFC;">
+                                <div class="final-score" th:text="${row.finalScore != null ? #numbers.formatDecimal(row.finalScore, 1, 1) : '-'}">
+                                    8.2
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(report.rows)}">
+                            <td th:colspan="${5 + #lists.size(report.headers)}" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
+                                Chưa có dữ liệu sinh viên trong lớp học này.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Print Footer -->
+        <div class="mt-5 d-none d-print-block">
+            <div class="row">
+                <div class="col-8"></div>
+                <div class="col-4 text-center">
+                    <p class="mb-4">Ngày ...... tháng ...... năm ......</p>
+                    <p class="fw-bold text-uppercase">Người lập bảng</p>
+                    <div style="height: 80px;"></div>
+                    <p class="fw-bold">..........................................</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
+

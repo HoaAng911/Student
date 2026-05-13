@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layoutPage('Cấu hình điểm lớp học phần', ~{:: content})}">
+<head>
+    <style>
+        .config-container { max-width: 1000px; margin: 0 auto; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); padding: 2rem; }
+        .progress-wrapper { margin-bottom: 2rem; position: sticky; top: 1rem; z-index: 100; }
+        .progress { height: 1.5rem; border-radius: 1rem; background-color: #e9ecef; }
+        .progress-bar { transition: width 0.4s ease; font-weight: bold; }
+        .weight-input { width: 80px; text-align: center; }
+        .btn-premium { border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 600; }
+        .btn-add { background-color: #f8f9fa; border: 2px dashed #dee2e6; color: #6c757d; width: 100%; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="config-container p-3">
+            <input type="hidden" id="sectionIdHidden" th:value="${sectionId}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-primary mb-1">Cấu hình thành phần điểm</h2>
+                    <p class="text-muted" id="sectionInfo">Đang tải...</p>
+                </div>
+                <a href="/api/course-sections" class="btn btn-outline-secondary btn-premium">Quay lại</a>
+            </div>
+
+            <div class="progress-wrapper glass-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">Tổng trọng số: <span id="totalWeightText">0%</span></span>
+                    <span id="validationMsg" class="badge rounded-pill bg-danger">Chưa đủ 100%</span>
+                </div>
+                <div class="progress">
+                    <div id="totalProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="table-responsive">
+                    <table id="gradeTable" class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tên</th><th>Loại</th><th>Mã</th><th>Trọng số (%)</th><th>Bắt buộc</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradeBody"></tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-add btn-premium" onclick="window.addRow()">+ Thêm thành phần điểm</button>
+                <div class="mt-5 d-flex justify-content-end gap-3">
+                    <button type="button" id="btnSave" class="btn btn-primary btn-premium" disabled onclick="window.saveConfig()">Lưu cấu hình</button>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            (function() {
+                const sectionId = document.getElementById('sectionIdHidden').value;
+                let categories = [];
+                let components = [];
+
+                console.log("Config script started. ID:", sectionId);
+
+                window.addRow = function() {
+                    components.push({ componentName: 'Mới', componentCode: 'NEW', weightPercentage: 0, isRequired: true, isFinal: false, categoryId: null });
+                    renderTable();
+                    calculateTotal();
+                };
+
+                window.removeRow = function(i) { components.splice(i, 1); renderTable(); calculateTotal(); };
+                window.updateData = function(i, f, v) { components[i][f] = v; };
+                window.updateWeight = function(i, v) { components[i].weightPercentage = parseFloat(v) || 0; calculateTotal(); };
+                window.updateCategory = function(i, id) {
+                    if (id === 'OTHER') {
+                        components[i].categoryId = null;
+                        renderTable();
+                        return;
+                    }
+                    const c = categories.find(x => x.id === id);
+                    if(c) { 
+                        components[i].categoryId = id; 
+                        components[i].componentName = c.name; 
+                        components[i].componentCode = c.code; 
+                        renderTable(); 
+                    }
+                };
+
+                function renderTable() {
+                    const b = document.getElementById('gradeBody');
+                    if(!b) return;
+                    b.innerHTML = '';
+                    if(components.length === 0) {
+                        b.innerHTML = '<tr><td colspan="6" class="text-center py-4">Trống. Hãy thêm dòng mới.</td></tr>';
+                        return;
+                    }
+                    components.forEach((c, i) => {
+                        const r = document.createElement('tr');
+                        r.innerHTML = `
+                            <td><input type="text" class="form-control" value="${c.componentName||''}" onchange="updateData(${i},'componentName',this.value)"></td>
+                            <td>
+                                <select class="form-select" onchange="updateCategory(${i},this.value)">
+                                    <option value="">-- Chọn --</option>
+                                    ${categories.map(cat => `<option value="${cat.id}" ${(c.categoryId === cat.id)?'selected':''}>${cat.name}</option>`).join('')}
+                                    <option value="OTHER" ${(!c.categoryId && c.componentName !== 'Mới' && c.componentName !== '') ? 'selected' : ''}>Khác...</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" value="${c.componentCode||''}" oninput="updateData(${i},'componentCode',this.value)"></td>
+                            <td><input type="number" class="form-control weight-input" value="${c.weightPercentage||0}" oninput="updateWeight(${i},this.value)"></td>
+                            <td><input type="checkbox" ${c.isRequired?'checked':''} onchange="updateData(${i},'isRequired',this.checked)"></td>
+                            <td>${c.isFinal ? '' : `<button type="button" class="btn btn-sm btn-link text-danger" onclick="removeRow(${i})">Xóa</button>`}</td>
+                        `;
+                        b.appendChild(r);
+                    });
+                }
+
+                function calculateTotal() {
+                    const t = components.reduce((s, c) => s + (parseFloat(c.weightPercentage) || 0), 0);
+                    document.getElementById('totalWeightText').innerText = t + '%';
+                    const pb = document.getElementById('totalProgressBar');
+                    pb.style.width = Math.min(t, 100) + '%';
+                    pb.innerText = t + '%';
+                    const msg = document.getElementById('validationMsg');
+                    const btn = document.getElementById('btnSave');
+                    if (Math.abs(t - 100) < 0.01) {
+                        pb.className = 'progress-bar bg-success';
+                        msg.innerText = 'Hợp lệ'; msg.className = 'badge bg-success';
+                        btn.disabled = false;
+                    } else {
+                        pb.className = 'progress-bar bg-warning text-dark';
+                        msg.innerText = 'Chưa đủ 100%'; msg.className = 'badge bg-warning text-dark';
+                        btn.disabled = true;
+                    }
+                }
+
+                window.saveConfig = async function() {
+                    // Chuyển đổi DTO ngược lại thành Entity structure (nếu cần) trước khi gửi
+                    // Ở đây Backend dùng @RequestBody List<GradeComponent>, Jackson sẽ tự map categoryId nếu có setter hoặc chúng ta gửi đúng cấu trúc
+                    // Nhưng để an toàn, hãy gửi theo cấu trúc mà Backend mong đợi
+                    const dataToSend = components.map(c => ({
+                        ...c,
+                        gradeCategory: c.categoryId ? { id: c.categoryId } : null
+                    }));
+
+                    const res = await fetch(`/api/grade-components/section/${sectionId}/bulk-update`, {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(dataToSend)
+                    });
+                    if(res.ok) { alert('Lưu thành công!'); location.reload(); }
+                    else { alert('Lỗi: ' + await res.text()); }
+                };
+
+                // Load Data
+                (async function() {
+                    try {
+                        const [r1, r2] = await Promise.all([
+                            fetch('/api/grade-components/categories').then(r => r.json()),
+                            fetch(`/api/grade-components/section/${sectionId}`).then(r => r.json())
+                        ]);
+                        categories = r1 || [];
+                        components = r2 || [];
+                    } catch(e) { console.error("API error:", e); }
+                    renderTable();
+                    calculateTotal();
+                    document.getElementById('sectionInfo').innerText = 'Cấu hình trọng số cho lớp học phần';
+                })();
+            })();
+        </script>
+    </th:block>
+</body>
+</html>

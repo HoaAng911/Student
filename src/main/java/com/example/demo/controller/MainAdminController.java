@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.courses.repository.CourseSectionRepository;
+import com.example.demo.students.service.StudentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,27 +10,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/api")
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class MainAdminController {
 
-    private final com.example.demo.service.StudentService studentService;
+    private final StudentService studentService;
+    private final CourseSectionRepository courseSectionRepository;
+    private final com.example.demo.studentgrades.service.StudentGradeService studentGradeService;
 
     @GetMapping
-    public String index(Model model) {
-        model.addAttribute("currentMenu", "home");
-        return "admin/index";
-    }
+    public String index(jakarta.servlet.http.HttpSession session, Model model) {
+        com.example.demo.users.model.entity.User currentUser = (com.example.demo.users.model.entity.User) session.getAttribute("currentUser");
+        if (currentUser == null) return "redirect:/login";
 
-    @GetMapping("/students")
-    public String students(Model model, 
-                           @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page) {
-        model.addAttribute("currentMenu", "students");
-        org.springframework.data.domain.Page<com.example.demo.model.Student> studentPage = 
-            studentService.getAllPaged(org.springframework.data.domain.PageRequest.of(page, 10));
-        
-        model.addAttribute("studentPage", studentPage);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", studentPage.getTotalPages());
-        return "admin/students/list";
+        String roleCode = currentUser.getRoles().stream()
+                .map(com.example.demo.roles.model.entity.Role::getCode)
+                .findFirst()
+                .orElse("STUDENT");
+
+        model.addAttribute("currentMenu", "home");
+        model.addAttribute("userRole", roleCode);
+        model.addAttribute("displayName", currentUser.getUsername());
+
+        if ("ADMIN".equals(roleCode)) {
+            // Dữ liệu cho Admin
+            model.addAttribute("totalStudents", studentService.getAllPaged(org.springframework.data.domain.PageRequest.of(0, 1)).getTotalElements());
+            model.addAttribute("totalSections", courseSectionRepository.count());
+            
+            courseSectionRepository.findAll().stream().findFirst().ifPresent(section -> {
+                model.addAttribute("demoSectionId", section.getId());
+            });
+        } else if ("TEACHER".equals(roleCode)) {
+            // Dữ liệu cho Giảng viên: Các lớp đang phụ trách
+            model.addAttribute("mySections", studentGradeService.getCourseSectionsByLecturer(currentUser.getId()));
+        }
+
+        return "admin/index";
     }
 }

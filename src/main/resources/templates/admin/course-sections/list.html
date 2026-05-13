@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Quản lý lớp học phần', content=~{:: content})}">
+<body>
+<th:block th:fragment="content">
+  <div class="container-fluid py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb bg-transparent p-0 mb-0">
+        <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang chủ</a></li>
+        <li class="breadcrumb-item active">Lớp học phần</li>
+      </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Danh sách lớp học phần</h5>
+        <button class="btn btn-primary btn-sm px-3"><i class="bi bi-plus-lg me-2"></i>Tạo lớp mới</button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Mã lớp</th>
+                <th>Tên lớp học phần</th>
+                <th>Môn học</th>
+                <th class="text-center">Sĩ số</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-center" style="width: 200px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="section : ${sections}">
+                <td class="ps-4">
+                   <code class="text-primary fw-bold" th:text="${section.code}">IT101-01</code>
+                </td>
+                <td th:text="${section.name}">Lập trình Java Cơ bản</td>
+                <td>
+                   <span th:if="${section.course != null}" th:text="${section.course.name}">Java</span>
+                </td>
+                <td class="text-center">
+                   <span class="badge bg-light text-dark border" th:text="${section.maxStudents}">40</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3" th:text="${section.status}">Open</span>
+                </td>
+
+                <td class="text-center">
+                   <div class="d-flex gap-2 justify-content-center">
+                       <a th:href="@{/api/student-grades/course-section/{id}(id=${section.id})}" 
+                          class="btn btn-sm btn-outline-success" title="Bảng điểm ma trận">
+                         <i class="bi bi-grid-3x3-gap"></i>
+                       </a>
+                       <a th:href="@{/api/grade-components/config/section/{id}(id=${section.id})}" 
+                          class="btn btn-sm btn-outline-primary" title="Cấu hình trọng số điểm">
+                         <i class="bi bi-gear"></i>
+                       </a>
+                   </div>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(sections)}">
+                <td colspan="6" class="text-center py-5 text-muted">Chưa có lớp học phần nào.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+</body>
+</html>

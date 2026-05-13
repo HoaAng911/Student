@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.students.model.entity.Student;
 import com.example.demo.students.service.StudentService;
 
+/**
+ * Controller cung cấp các API RESTful để quản lý Sinh viên.
+ * Base Path: /api/v1/students
+ */
 @RestController
-@RequestMapping("/api/students")
-@CrossOrigin // cho phép frontend gọi
+@RequestMapping("/api/v1/students")
+@CrossOrigin // Cho phép các ứng dụng Frontend (React, Vue, HTML tĩnh) gọi API này
 public class StudentController {
 
     private final StudentService service;
@@ -28,41 +32,41 @@ public class StudentController {
         this.service = service;
     }
 
-    // GET ALL
+    /** [GET] Lấy danh sách tất cả sinh viên */
     @GetMapping
     public List<Student> getAll() {
         return service.getAll();
     }
 
-    // GET BY ID
+    /** [GET] Lấy chi tiết một sinh viên theo ID */
     @GetMapping("/{id}")
     public Student getById(@PathVariable UUID id) {
         return service.getById(id);
     }
 
-    // CREATE
+    /** [POST] Thêm mới một sinh viên */
     @PostMapping
     public Student create(@RequestBody Student student) {
         return service.create(student);
     }
 
-    // UPDATE
+    /** [PUT] Cập nhật thông tin sinh viên theo ID */
     @PutMapping("/{id}")
     public Student update(@PathVariable UUID id,
                           @RequestBody Student student) {
         return service.update(id, student);
     }
 
-    // DELETE
+    /** [DELETE] Xóa một sinh viên khỏi hệ thống */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         service.delete(id);
     }
 
-    // SEARCH BY NAME
+    /** [GET] Tìm kiếm sinh viên theo họ tên */
     @GetMapping("/search")
     public List<Student> search(@RequestParam String full_name) {
         return service.search(full_name);
     }
 
-}
+}

@@ -12,30 +12,59 @@
       <span class="nav-text">Trang chủ</span>
     </a>
 
-    <div class="sidebar-label">Quản lý dữ liệu</div>
+    <div class="sidebar-label" th:if="${session.currentUser != null and #lists.contains(session.currentUser.roles.![code], 'ADMIN')}">Quản lý hệ thống</div>
 
-    <a class="sidebar-link" th:href="@{/api/students}" th:classappend="${currentMenu == 'students'} ? ' active' : ''"
-      data-label="Sinh viên">
+    <a class="sidebar-link" th:href="@{/api/students}" 
+       th:if="${session.currentUser != null and (#lists.contains(session.currentUser.roles.![code], 'ADMIN') or #lists.contains(session.currentUser.roles.![code], 'TEACHER'))}"
+       th:classappend="${currentMenu == 'students'} ? ' active' : ''"
+       data-label="Sinh viên">
       <i class="bi bi-mortarboard nav-icon"></i>
       <span class="nav-text">Sinh viên</span>
     </a>
 
+    <a class="sidebar-link" th:href="@{/api/course-sections}" 
+       th:if="${session.currentUser != null and (#lists.contains(session.currentUser.roles.![code], 'ADMIN') or #lists.contains(session.currentUser.roles.![code], 'TEACHER'))}"
+       th:classappend="${currentMenu == 'courseSections'} ? ' active' : ''"
+       data-label="Lớp học phần">
+      <i class="bi bi-collection nav-icon"></i>
+      <span class="nav-text">Lớp học phần</span>
+    </a>
+
     <a class="sidebar-link" th:href="@{/api/student-grades}"
-      th:classappend="${currentMenu == 'studentGrades'} ? ' active' : ''" data-label="Điểm sinh viên">
+       th:if="${session.currentUser != null and (#lists.contains(session.currentUser.roles.![code], 'ADMIN') or #lists.contains(session.currentUser.roles.![code], 'TEACHER'))}"
+       th:classappend="${currentMenu == 'studentGrades'} ? ' active' : ''" data-label="Điểm sinh viên">
       <i class="bi bi-clipboard-data nav-icon"></i>
       <span class="nav-text">Điểm sinh viên</span>
     </a>
 
     <a class="sidebar-link" th:href="@{/api/grade-components}"
-      th:classappend="${currentMenu == 'gradeComponents'} ? ' active' : ''" data-label="Thành phần điểm">
+       th:if="${session.currentUser != null and #lists.contains(session.currentUser.roles.![code], 'ADMIN')}"
+       th:classappend="${currentMenu == 'gradeComponents'} ? ' active' : ''" data-label="Thành phần điểm">
       <i class="bi bi-list-stars nav-icon"></i>
       <span class="nav-text">Thành phần điểm</span>
     </a>
 
     <a class="sidebar-link" th:href="@{/api/grade-scales}"
-      th:classappend="${currentMenu == 'gradeScales'} ? ' active' : ''" data-label="Thang điểm">
+       th:if="${session.currentUser != null and #lists.contains(session.currentUser.roles.![code], 'ADMIN')}"
+       th:classappend="${currentMenu == 'gradeScales'} ? ' active' : ''" data-label="Thang điểm">
       <i class="bi bi-bar-chart-steps nav-icon"></i>
       <span class="nav-text">Thang điểm</span>
+    </a>
+    <div th:if="${session.currentUser != null and #lists.contains(session.currentUser.roles.![code], 'STUDENT')}">
+        <div class="sidebar-label">Cá nhân</div>
+
+        <a class="sidebar-link" th:href="@{/student/my-grades}"
+          th:classappend="${currentMenu == 'myGrades'} ? ' active' : ''" data-label="Bảng điểm cá nhân">
+          <i class="bi bi-person-badge nav-icon"></i>
+          <span class="nav-text">Bảng điểm cá nhân</span>
+        </a>
+    </div>
+
+    <div class="sidebar-label">Hệ thống</div>
+    
+    <a class="sidebar-link" th:href="@{/logout}" data-label="Đăng xuất">
+      <i class="bi bi-box-arrow-left nav-icon text-danger"></i>
+      <span class="nav-text text-danger">Đăng xuất</span>
     </a>
 
   </aside>

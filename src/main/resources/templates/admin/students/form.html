@@ -3,71 +3,206 @@
       th:replace="~{layout/layout :: layoutPage(pageTitle=${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên', content=~{:: content})}">
 <body>
 <th:block th:fragment="content">
-  <div class="container-fluid">
+    <style>
+        :root {
+            --table-border: #e2e8f0;
+            --primary-soft: rgba(93, 95, 239, 0.08);
+        }
 
-    <nav aria-label="breadcrumb" class="mb-4">
-      <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a th:href="@{/api}" class="text-decoration-none">Trang quản trị</a></li>
-        <li class="breadcrumb-item"><a th:href="@{/api/students}" class="text-decoration-none">Sinh viên</a></li>
-        <li class="breadcrumb-item active" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></li>
-      </ol>
-    </nav>
+        .form-container {
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
 
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="card border-0">
-          <div class="card-header d-flex align-items-center py-3">
-            <div class="p-2 rounded-3 me-3" style="background: rgba(59,130,246,0.08);">
-              <i class="bi bi-person-plus text-primary fs-4"></i>
-            </div>
-            <div>
-              <h5 class="mb-0 fw-bold text-dark" th:text="${isEdit} ? 'Cập nhật sinh viên' : 'Thêm sinh viên mới'"></h5>
-              <p class="text-muted small mb-0">Nhập thông tin cá nhân của sinh viên</p>
-            </div>
-          </div>
-          <div class="card-body p-4">
-            <form th:action="@{/api/students/save}" th:object="${student}" method="post" novalidate>
-              <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
-              <input type="hidden" name="isEdit" th:value="${isEdit}"/>
+        .modern-form-card {
+            background: #ffffff !important;
+            border: 2px solid var(--table-border) !important;
+            border-radius: 20px !important;
+            box-shadow: var(--shadow-card) !important;
+            overflow: hidden !important;
+        }
 
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Tên sinh viên <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                  <input type="text" th:field="*{name}"
-                         th:class="'form-control border-start-0' + (${#fields.hasErrors('name')} ? ' is-invalid' : '')"
-                         maxlength="150" placeholder="Nhập họ và tên sinh viên"/>
+        .form-header {
+            background: #f8fafc !important;
+            padding: 2rem !important;
+            border-bottom: 2px solid var(--table-border) !important;
+        }
+
+        .form-section-title {
+            font-size: 0.85rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            color: #64748B !important;
+            letter-spacing: 0.05em !important;
+            margin-bottom: 1.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        .form-section-title::after {
+            content: "" !important;
+            height: 2px !important;
+            flex: 1 !important;
+            background: #e2e8f0 !important;
+        }
+
+        .custom-input-group {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .custom-input-group label {
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            margin-bottom: 0.5rem !important;
+            display: block !important;
+            font-size: 0.9rem !important;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 0.75rem 1rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 4px var(--primary-soft) !important;
+            outline: none !important;
+        }
+
+        .btn-save {
+            background: #1e293b !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            padding: 0.8rem 2rem !important;
+            font-weight: 800 !important;
+            border: none !important;
+            transition: all 0.3s !important;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            background: #000 !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <div class="form-container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/api}" class="text-muted small">Quản trị</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/api/students}" class="text-muted small">Sinh viên</a></li>
+                <li class="breadcrumb-item active small" th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'">Thêm mới</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="modern-form-card">
+                    <div class="form-header d-flex align-items-center">
+                        <div class="p-3 rounded-4 me-4" style="background: var(--primary-soft); color: var(--primary-color);">
+                            <i class="bi bi-person-bounding-box fs-3"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-900 text-dark mb-1" th:text="${isEdit} ? 'Cập nhật Hồ sơ Sinh viên' : 'Thêm Sinh viên Mới'"></h3>
+                            <p class="text-muted mb-0 small fw-bold">Vui lòng điền chính xác thông tin theo hồ sơ gốc của sinh viên.</p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/api/students/save}" th:object="${student}" method="post" class="p-4 p-md-5">
+                        <input type="hidden" th:field="*{id}" th:if="${isEdit}"/>
+
+                        <div class="row">
+                            <!-- Thông tin định danh -->
+                            <div class="col-12">
+                                <div class="form-section-title">Thông tin định danh</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-input-group">
+                                    <label>Mã số sinh viên <span class="text-danger">*</span></label>
+                                    <input type="text" th:field="*{code}" class="form-control" placeholder="Ví dụ: SV2024001" required/>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="custom-input-group">
+                                    <label>Họ và tên đầy đủ <span class="text-danger">*</span></label>
+                                    <input type="text" th:field="*{fullname}" class="form-control" placeholder="Nhập đầy đủ họ tên" required/>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin cá nhân -->
+                            <div class="col-12 mt-4">
+                                <div class="form-section-title">Thông tin cá nhân</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-input-group">
+                                    <label>Giới tính</label>
+                                    <select th:field="*{gender}" class="form-select">
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-input-group">
+                                    <label>Ngày sinh</label>
+                                    <input type="date" th:field="*{date_of_birth}" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-input-group">
+                                    <label>Số CCCD/CMND</label>
+                                    <input type="text" th:field="*{personal_identification_number}" class="form-control" placeholder="12 chữ số"/>
+                                </div>
+                            </div>
+
+                            <!-- Địa chỉ & Trạng thái -->
+                            <div class="col-12 mt-4">
+                                <div class="form-section-title">Liên lạc & Trạng thái</div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="custom-input-group">
+                                    <label>Địa chỉ thường trú</label>
+                                    <input type="text" th:field="*{address}" class="form-control" placeholder="Số nhà, tên đường, phường/xã..."/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-input-group">
+                                    <label>Trạng thái học tập</label>
+                                    <select th:field="*{status}" class="form-select">
+                                        <option value="Đang học">Đang học</option>
+                                        <option value="Bảo lưu">Bảo lưu</option>
+                                        <option value="Đã tốt nghiệp">Đã tốt nghiệp</option>
+                                        <option value="Thôi học">Thôi học</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex align-items-center gap-3 mt-5 pt-4 border-top">
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-cloud-check-fill me-2"></i> 
+                                <span th:text="${isEdit} ? 'Lưu thay đổi' : 'Xác nhận Thêm mới'"></span>
+                            </button>
+                            <a th:href="@{/api/students}" class="btn btn-link text-decoration-none fw-bold text-muted">
+                                <i class="bi bi-x-lg me-1"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-              </div>
-
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Email liên hệ</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                  <input type="email" th:field="*{email}"
-                         th:class="'form-control border-start-0' + (${#fields.hasErrors('email')} ? ' is-invalid' : '')"
-                         maxlength="150" placeholder="VD: sv@school.edu.vn"/>
-                </div>
-                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-              </div>
-
-              <div class="d-flex align-items-center gap-3 mt-5 pt-3 border-top">
-                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3">
-                  <i class="bi bi-save me-2"></i>
-                  <span th:text="${isEdit} ? 'Cập nhật' : 'Thêm mới'"></span>
-                </button>
-                <a th:href="@{/api/students}" class="btn btn-link text-secondary text-decoration-none">
-                  Hủy bỏ và quay lại
-                </a>
-              </div>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
     </div>
-
-  </div>
 </th:block>
 </body>
 </html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layoutPage(pageTitle='Bảng điểm cá nhân', content=~{:: content})}">
+<head>
+    <style>
+        .profile-header-card {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-header-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 300px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(93, 95, 239, 0.03));
+        }
+        .student-avatar-large {
+            width: 120px; height: 120px;
+            border-radius: 24px;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: var(--shadow-md);
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            height: 100%;
+        }
+        .progress-slim {
+            height: 8px;
+            border-radius: 10px;
+            background: #F1F5F9;
+        }
+        .progress-slim .progress-bar {
+            border-radius: 10px;
+            background: var(--primary-color);
+        }
+        .course-card {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            border: 1px solid #F1F5F9;
+            transition: var(--transition);
+        }
+        .course-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .course-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #F8FAFC;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .course-body {
+            padding: 0;
+        }
+        .grade-table th {
+            background: #F8FAFC;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748B;
+            padding: 12px 24px;
+        }
+        .grade-table td {
+            padding: 16px 24px;
+            font-size: 0.875rem;
+        }
+        .letter-grade-circle {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem;
+            background: #F0F9FF;
+            color: #0369A1;
+        }
+        .badge-status {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .bg-soft-primary {
+            background-color: #EEF2FF !important;
+            color: #5D5FEF !important;
+        }
+        .matrix-table th {
+            font-size: 0.65rem !important;
+            letter-spacing: 0.05em;
+            padding: 12px 10px !important;
+        }
+        .extra-small {
+            font-size: 0.65rem;
+        }
+        .fw-700 { font-weight: 700; }
+        .fw-800 { font-weight: 800; }
+    </style>
+</head>
+<body>
+<th:block th:fragment="content">
+    <div class="container-fluid py-4">
+        <!-- Top Navigation (Sub-menu) -->
+        <div class="d-flex gap-4 mb-4 text-muted small fw-600">
+            <a href="#" class="text-primary text-decoration-none border-bottom border-primary border-2 pb-2">Tổng quan kỳ học</a>
+            <a href="#" class="text-muted text-decoration-none pb-2">Danh mục Giảng viên</a>
+            <a href="#" class="text-muted text-decoration-none pb-2">Tài nguyên</a>
+        </div>
+
+        <!-- Back to List (For Admin/Teacher) -->
+        <div class="row mb-4" th:if="${viewOnly}">
+            <div class="col-12">
+                <a th:href="@{/api/students}" class="btn btn-outline-dark rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i> Quay lại danh sách sinh viên
+                </a>
+            </div>
+        </div>
+
+        <!-- Student Profile Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8">
+                <div class="profile-header-card">
+                    <img th:src="'https://ui-avatars.com/api/?name=' + ${student.fullname} + '&size=120&background=5D5FEF&color=fff'" class="student-avatar-large" alt="avatar">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <h2 class="fw-800 mb-0" th:text="${student.fullname}">Julian M. Sterling</h2>
+                            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-2" style="background: #EEF2FF; font-size: 0.7rem;">Đang theo học</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="text-muted small">MÃ SINH VIÊN</div>
+                                <div class="fw-bold" th:text="${student.code}">SV1001</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">CHUYÊN NGÀNH</div>
+                                <div class="fw-bold">Khoa học máy tính</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 row">
+                             <div class="col-md-6">
+                                <div class="text-muted small">CỐ VẤN HỌC TẬP</div>
+                                <div class="fw-bold">TS. Elena Rodriguez</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="stat-card d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="text-muted small mb-1">XẾP LOẠI HỌC TẬP</div>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <h2 class="fw-800 mb-0 text-primary">3.88</h2>
+                            <span class="text-muted">/ 4.0 GPA</span>
+                        </div>
+                        <div class="text-success small fw-600 mt-1"><i class="bi bi-stars"></i> Danh sách khen thưởng</div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">Tiến độ hoàn thành</span>
+                            <span class="fw-bold">88%</span>
+                        </div>
+                        <div class="progress progress-slim">
+                            <div class="progress-bar" style="width: 88%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matrix Transcript Section -->
+        <div class="card shadow-sm border-0 rounded-xl overflow-hidden mb-5">
+            <div class="card-header bg-white border-bottom py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="fw-800 mb-0">Học kỳ: Fall 2024</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-file-earmark-pdf me-1"></i> Export PDF</button>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3"><i class="bi bi-printer me-1"></i> Print View</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 matrix-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4" style="min-width: 200px;">MÔN HỌC</th>
+                                <th th:each="cat : ${categories}" class="text-center text-uppercase extra-small fw-700" th:text="${cat.name}">Category</th>
+                                <th class="text-center text-uppercase extra-small fw-700" style="width: 150px;">THÀNH PHẦN KHÁC</th>
+                                <th class="text-center text-uppercase extra-small fw-700 bg-soft-primary" style="width: 100px;">TỔNG KẾT</th>
+                                <th class="text-center text-uppercase extra-small fw-700" style="width: 100px;">KẾT QUẢ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cg : ${courseGrades}">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-soft-primary text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            <i class="bi bi-journal-text"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small" th:text="${cg.registration.courseSection.name}">Neural Circuitry</div>
+                                            <div class="text-muted extra-small" th:text="${cg.registration.courseSection.course.code + ' • ' + cg.registration.courseSection.course.credits + ' TC'}">NSC-402 • 3 TC</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- Các cột điểm thành phần chuẩn (Xử lý thông minh) -->
+                                <td th:each="cat : ${categories}" class="text-center" 
+                                    th:style="${cg.activeCategoryIds.contains(cat.id.toString()) ? '' : 'background-color: #fdfdfd; color: #ced4da;'}">
+                                    
+                                    <!-- 1. Trường hợp Môn học CÓ thành phần này -->
+                                    <th:block th:if="${cg.activeCategoryIds.contains(cat.id.toString())}">
+                                        <span th:with="score=${cg.categoryGrades.get(cat.id.toString())}"
+                                              th:class="${score != null ? 'fw-600' : 'text-danger-emphasis extra-small'}"
+                                              th:text="${score != null ? score : 'Chưa chấm'}">
+                                        </span>
+                                    </th:block>
+                                    
+                                    <!-- 2. Trường hợp Môn học KHÔNG CÓ thành phần này -->
+                                    <th:block th:unless="${cg.activeCategoryIds.contains(cat.id.toString())}">
+                                        <span class="extra-small opacity-50">N/A</span>
+                                    </th:block>
+                                </td>
+                                <!-- Cột các thành phần tùy chỉnh (Khác) -->
+                                <td class="text-center text-muted extra-small">
+                                    <span th:text="${cg.otherGradesText != '' ? cg.otherGradesText : '-'}">-</span>
+                                </td>
+                                <!-- Cột Tổng kết -->
+                                <td class="text-center bg-soft-primary">
+                                    <div class="fw-800 text-primary" th:text="${cg.calculatedScore > 0 ? #numbers.formatDecimal(cg.calculatedScore, 1, 1) : '-'}">7.5</div>
+                                    <div class="extra-small fw-700 text-primary-emphasis" th:if="${cg.calculatedScore > 0}" th:text="${cg.totalGrade != null ? cg.totalGrade.letterGrade : 'Dự kiến'}">B</div>
+                                </td>
+                                <!-- Trạng thái -->
+                                <td class="text-center">
+                                    <span th:if="${cg.calculatedScore >= 4.0}" class="badge bg-success-subtle text-success rounded-pill px-2 py-1 extra-small">ĐẠT</span>
+                                    <span th:if="${cg.calculatedScore > 0 && cg.calculatedScore < 4.0}" class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 extra-small">HỌC LẠI</span>
+                                    <span th:if="${cg.calculatedScore == 0}" class="text-muted extra-small">Đang học</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
